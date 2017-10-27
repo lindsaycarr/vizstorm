@@ -22,22 +22,26 @@ info:
     dplyr:
       repo: CRAN
       version: 0.5.0
+    sf:
+      repo: CRAN
+      version: 0.4.3
+    svglite:
+      repo: CRAN 
+      version: 1.2.0
 parameter:
   -
-    id: parameter_spatial
+    id: spatial_metadata
     crs: '+init=epsg:2163'
-    bbox: [-120,30,-74,42]
-    height: 5
-    width: 8
-    pointsize: 12
+    bbox: [-120, 30, -74, 42]
+
 fetch:
   -
-    id: fetch_view_limits
-    location: cache/fetch_view_limits.rds
+    id: viewbox_limits
+    location: cache/viewbox_limits.rds
     reader: rds
-    fetcher: fetch_view_limits
-    scripts: [scripts/fetch/fetch_view_limits.R]
-    depends: "parameter_spatial"
+    fetcher: viewbox_limits
+    scripts: [scripts/fetch/viewbox_limits.R]
+    depends: ["spatial_metadata"]
     comment: sets up the basic view window and projection
 process:
 visualize:
