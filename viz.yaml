@@ -25,6 +25,9 @@ info:
     sf:
       repo: CRAN
       version: 0.4.3
+    svglite:
+      repo: CRAN 
+      version: 1.2.0
 parameter:
   -
     id: spatial_metadata

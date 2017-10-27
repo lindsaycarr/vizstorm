@@ -61,18 +61,18 @@ bbox_to_polygon <- function(bbox, bbox_crs = "+init=epsg:4326", return_crs = NUL
 #' extract the plotting limits from a spatial object, given a sized svg viewbox
 #' 
 #' @param geo an sf:: sfc object
-#' @param ... additional arguments passed to the plotting methods of `sf` (e.g., `expandBB`)
+#' @param ... additional arguments passed to svglite::svgstring, e.g., width, height
 #' @param width the width (in inches) of the svg view
 #' @param height the height (in inches) of the svg view
 #' @param pointsize number of pixels per inch
 #' 
 #' @return a list of limits, named w/ `xlim` and `ylim`
 
-plot_viewbox_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12){
+plot_viewbox_limits <- function(geo, ...){
   
   if("sfc" %in% class(geo)) {
-    .fun <- svglite::svgstring(width = width, height = height, pointsize = pointsize, standalone = F)
-    suppressWarnings(plot(geo, ...))
+    .fun <- svglite::svgstring(..., standalone = F)
+    plot(geo)
   } else {
     stop("only tested with sfc objects.")
   }
