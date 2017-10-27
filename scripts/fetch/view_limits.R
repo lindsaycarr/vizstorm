@@ -9,7 +9,7 @@
 #'   \item{width}{figure width inches}
 #'   \item{pointsize}{number of pixels per inch}
 #' }
-fetch.fetch_view_limits <- function(viz = as.viz('fetch_view_limits')){
+fetch.view_limits <- function(viz = as.viz('fetch_view_limits')){
   
   deps <- readDepends(viz)
   required <- "parameter_spatial"
