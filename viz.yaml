@@ -1,0 +1,44 @@
+vizlab: "0.2.2.9003"
+info:
+  id: vizstorm
+  name: Template for storm event visualizations
+  date: 2017-10-26
+  publish-date: 2017-11-09
+  path: /vizstorm
+  analytics-id: UA-78530187-1
+  description: >-
+    Template for storm event visualizations
+  thumbnail:
+    url:
+    width: 250
+    height: 250
+    alttext:
+  required-packages:
+    vizlab:
+      repo: github
+      version: 0.2.2.9003
+      name: USGS-VIZLAB/vizlab
+      ref: v0.2.2.9003
+    dplyr:
+      repo: CRAN
+      version: 0.5.0
+parameter:
+  -
+    id: parameter_spatial
+    crs: '+init=epsg:2163'
+    bbox: [-120,30,-74,42]
+    height: 5
+    width: 8
+    pointsize: 12
+fetch:
+  -
+    id: fetch_view_limits
+    location: cache/fetch_view_limits.rds
+    reader: rds
+    fetcher: fetch_view_limits
+    scripts: [scripts/fetch/fetch_view_limits.R]
+    depends: "parameter_spatial"
+    comment: sets up the basic view window and projection
+process:
+visualize:
+publish:
