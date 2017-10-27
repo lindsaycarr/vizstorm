@@ -9,26 +9,27 @@
 #'   \item{width}{figure width inches}
 #'   \item{pointsize}{number of pixels per inch}
 #' }
-fetch.view_limits <- function(viz = as.viz('fetch_view_limits')){
-  
+fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
+
   deps <- readDepends(viz)
-  required <- "parameter_spatial"
-  checkRequired(deps, required)
-  p_spatial <- deps[["parameter_spatial"]]
-  checkRequired(p_spatial, c("bbox", "width", "height", "pointsize"))
+  
+  checkRequired(deps, c("spatial_metadata", "plot_metadata"))
+  
+  spatial_meta <- deps[["spatial_metadata"]]
+  plot_meta <- deps[["plot_metadata"]]
     
-  bbox_polygon <- bbox_to_polygon(p_spatial$bbox, 
-                            return_crs = p_spatial$crs)
+  bbox_polygon <- bbox_to_polygon(spatial_meta$bbox, 
+                            return_crs = spatial_meta$crs)
   
-  view_limits <- plot_view_limits(bbox_polygon,
-                               width = p_spatial$width, 
-                               height = p_spatial$height, 
-                               pointsize = p_spatial$pointsize)
+  svg_viewbox_limits <- plot_viewbox_limits(bbox_polygon,
+                               width = plot_meta$width, 
+                               height = plot_meta$height, 
+                               pointsize = plot_meta$pointsize)
   
-  saveRDS(view_limits, viz[['location']])
+  saveRDS(svg_viewbox_limits, viz[['location']])
 }
 
-fetchTimestamp.view_limits <- alwaysCurrent
+fetchTimestamp.viewbox_limits <- vizlab::alwaysCurrent
 
 #' @title Construct sf polygon box from two corner numeric bbox.
 #' @param bbox numeric xmin, ymin, xmax, ymax in WGS84 (EPSG:4326) lon,lat. 
@@ -57,7 +58,7 @@ bbox_to_polygon <- function(bbox, return_crs = NULL) {
 }
 
 
-#' extract the plotting limits from a spatial object, given a sized svg view
+#' extract the plotting limits from a spatial object, given a sized svg viewbox
 #' 
 #' @param geo an sf:: sfc object
 #' @param ... additional arguments passed to the plotting methods of `sf` (e.g., `expandBB`)
@@ -67,7 +68,7 @@ bbox_to_polygon <- function(bbox, return_crs = NULL) {
 #' 
 #' @return a list of limits, named w/ `xlim` and `ylim`
 
-plot_view_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12){
+plot_viewbox_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12){
   
   if("sfc" %in% class(geo)) {
     .fun <- svglite::svgstring(width = width, height = height, pointsize = pointsize, standalone = F)

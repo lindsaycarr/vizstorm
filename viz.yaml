@@ -24,20 +24,23 @@ info:
       version: 0.5.0
 parameter:
   -
-    id: parameter_spatial
+    id: spatial_metadata
     crs: '+init=epsg:2163'
     bbox: [-120,30,-74,42]
+  - 
+    id: plot_metadata
     height: 5
     width: 8
     pointsize: 12
+
 fetch:
   -
-    id: fetch_view_limits
-    location: cache/fetch_view_limits.rds
+    id: viewbox_limits
+    location: cache/viewbox_limits.rds
     reader: rds
-    fetcher: view_limits
+    fetcher: viewbox_limits
     scripts: [scripts/fetch/view_limits.R]
-    depends: "parameter_spatial"
+    depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
 process:
 visualize:
