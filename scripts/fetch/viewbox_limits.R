@@ -22,17 +22,18 @@ fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
   
   # if `plot_metadata` isn't used, defaults from plot_viewbox_limits are used: 
   viewbox_args <- append(list(geo = bbox_polygon), deps[["plot_metadata"]])
-  svg_viewbox_limits <- do.call(plot_viewbox_limits, args = viewbox_args)
+  viewbox_limits <- do.call(plot_viewbox_limits, args = viewbox_args)
                                 
   
-  saveRDS(svg_viewbox_limits, viz[['location']])
+  saveRDS(viewbox_limits, viz[['location']])
 }
 
 fetchTimestamp.viewbox_limits <- vizlab::alwaysCurrent
 
 #' @title Construct sf polygon box from two corner numeric bbox.
-#' @param bbox numeric xmin, ymin, xmax, ymax in WGS84 (EPSG:4326) lon,lat. 
-#' @param return_crs if the returned bbox should be in a projection other than EPSG:4326, 
+#' @param bbox numeric xmin, ymin, xmax, ymax 
+#' @param bbox_crs the crs string of the bbox (epsg:4326; in WGS84 lon,lat by default)
+#' @param return_crs if the returned bbox should be in a projection other than bbox_crs, 
 #' pass in a crs string compatible with sf::st_transform()
 #' 
 #' @details 
@@ -42,13 +43,13 @@ fetchTimestamp.viewbox_limits <- vizlab::alwaysCurrent
 #' @return an object of class 'bbox' from sf::
 #' @example 
 #' bbox <- construct_sf_bbox(c(-87, 21, -70, 34), return_crs = "+init=epsg:5070")
-bbox_to_polygon <- function(bbox, return_crs = NULL) {
+bbox_to_polygon <- function(bbox, bbox_crs = "+init=epsg:4326", return_crs = NULL) {
   bbox_poly <- sf::st_sfc(sf::st_polygon(list(
     matrix(
       bbox[c(1,2, 1,4, 3,4, 3,2, 1,2)], 
       ncol = 2, byrow = TRUE)), 
     dim = "XY"), 
-    crs = "+init=epsg:4326")
+    crs = bbox_crs)
   if(!is.null(return_crs)) {
     sf::st_transform(bbox_poly, return_crs)
   } else {
