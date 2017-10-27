@@ -28,26 +28,27 @@ fetch.view_limits <- function(viz = as.viz('fetch_view_limits')){
   saveRDS(view_limits, viz[['location']])
 }
 
-fetchTimestamp.view_limits <- neverCurrent
+fetchTimestamp.view_limits <- alwaysCurrent
 
 #' @title Construct sf polygon box from two corner numeric bbox.
 #' @param bbox numeric xmin, ymin, xmax, ymax in WGS84 (EPSG:4326) lon,lat. 
-#' No rearranging is done!
 #' @param return_crs if the returned bbox should be in a projection other than EPSG:4326, 
 #' pass in a crs string compatible with sf::st_transform()
 #' 
+#' @details 
+#' No rearranging is done is currently done for lat/lon values (e.g., if min/max are out of order)
+#' This function currently doesn't check that the values are indeed within valid ranges 
+#' for lat/long
 #' @return an object of class 'bbox' from sf::
 #' @example 
 #' bbox <- construct_sf_bbox(c(-87, 21, -70, 34), return_crs = "+init=epsg:5070")
 bbox_to_polygon <- function(bbox, return_crs = NULL) {
-  bbox_poly <- sf::st_sfc(sf::st_polygon(list(matrix(c(bbox[c(1,2)], 
-                                  bbox[c(1,4)], 
-                                  bbox[c(3,4)], 
-                                  bbox[c(3,2)], 
-                                  bbox[c(1,2)]), 
-                                ncol = 2, byrow = T)), 
-                    dim = "XY"), 
-         crs = "+init=epsg:4326")
+  bbox_poly <- sf::st_sfc(sf::st_polygon(list(
+    matrix(
+      bbox[c(1,2, 1,4, 3,4, 3,2, 1,2)], 
+      ncol = 2, byrow = TRUE)), 
+    dim = "XY"), 
+    crs = "+init=epsg:4326")
   if(!is.null(return_crs)) {
     sf::st_transform(bbox_poly, return_crs)
   } else {
@@ -63,11 +64,10 @@ bbox_to_polygon <- function(bbox, return_crs = NULL) {
 #' @param width the width (in inches) of the svg view
 #' @param height the height (in inches) of the svg view
 #' @param pointsize number of pixels per inch
-#' @param return what limits to return
 #' 
-#' @return a list or numeric vector, depending on what is specified for `return`
+#' @return a list of limits, named w/ `xlim` and `ylim`
 
-plot_view_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12, return = c('xlim','ylim')){
+plot_view_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12){
   
   if("sfc" %in% class(geo)) {
     .fun <- svglite::svgstring(width = width, height = height, pointsize = pointsize, standalone = F)
@@ -80,11 +80,5 @@ plot_view_limits <- function(geo, ..., width = 10, height = 8, pointsize = 12, r
   xlim = usr[c(1,2)]
   ylim = usr[c(3,4)]
   
-  list.out <- list(xlim = xlim, ylim = ylim)
-    
-  if (length(return) > 1){
-    return(list.out)
-  } else {
-    return(list.out[[return]])
-  }
+  return(list(xlim = xlim, ylim = ylim))
 }
