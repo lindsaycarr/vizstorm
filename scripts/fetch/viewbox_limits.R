@@ -1,10 +1,15 @@
 #' @title Fetch viz view limits
-#' @param viz a vizlab object including a \code{parameter_spatial} parameter input.
-#' @details \code{parameter_spatial} must include:
+#' @param viz a vizlab object including a \code{spatial_metadata} parameter input, and
+#' optionally, a \code{"plot_metadata"} parameter input
+#' @details \code{spatial_metadata} must include:
 #' /describe{
-#'   \item{id}{parameter_spatial}
-#'   \item{crs}{valid crs for \pkg{sf}}
 #'   \item{bbox}{numeric in xmin, ymin, xmax, ymax order}
+#'}
+#' and optionally: 
+#' /describe{
+#'   \item{crs}{valid crs for \pkg{sf}}
+#' }
+#' \code{plot_metadata} is optional, and can include any of:
 #'   \item{height}{figure height inches}
 #'   \item{width}{figure width inches}
 #'   \item{pointsize}{number of pixels per inch}
@@ -17,6 +22,8 @@ fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
   
   spatial_meta <- deps[["spatial_metadata"]]
     
+  # if missing, `crs` will be NULL and used the `bbox_to_polygon` 
+  # return_crs default of bbox_crs, which will be WGS84
   bbox_polygon <- bbox_to_polygon(spatial_meta$bbox, 
                             return_crs = spatial_meta$crs)
   
