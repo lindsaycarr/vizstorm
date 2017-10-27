@@ -17,7 +17,7 @@ fetch.view_limits <- function(viz = as.viz('fetch_view_limits')){
   p_spatial <- deps[["parameter_spatial"]]
   checkRequired(p_spatial, c("bbox", "width", "height", "pointsize"))
     
-  bbox_polygon <- construct_sf_bbox(p_spatial$bbox, 
+  bbox_polygon <- bbox_to_polygon(p_spatial$bbox, 
                             return_crs = p_spatial$crs)
   
   view_limits <- plot_view_limits(bbox_polygon,
@@ -30,7 +30,7 @@ fetch.view_limits <- function(viz = as.viz('fetch_view_limits')){
 
 fetchTimestamp.view_limits <- neverCurrent
 
-#' @title Construct sf bbox from two corner numeric form.
+#' @title Construct sf polygon box from two corner numeric bbox.
 #' @param bbox numeric xmin, ymin, xmax, ymax in WGS84 (EPSG:4326) lon,lat. 
 #' No rearranging is done!
 #' @param return_crs if the returned bbox should be in a projection other than EPSG:4326, 
@@ -39,7 +39,7 @@ fetchTimestamp.view_limits <- neverCurrent
 #' @return an object of class 'bbox' from sf::
 #' @example 
 #' bbox <- construct_sf_bbox(c(-87, 21, -70, 34), return_crs = "+init=epsg:5070")
-construct_sf_bbox <- function(bbox, return_crs = NULL) {
+bbox_to_polygon <- function(bbox, return_crs = NULL) {
   bbox_poly <- sf::st_sfc(sf::st_polygon(list(matrix(c(bbox[c(1,2)], 
                                   bbox[c(1,4)], 
                                   bbox[c(3,4)], 
