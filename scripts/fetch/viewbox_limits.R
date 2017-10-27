@@ -13,18 +13,17 @@ fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
 
   deps <- readDepends(viz)
   
-  checkRequired(deps, c("spatial_metadata", "plot_metadata"))
+  checkRequired(deps, "spatial_metadata")
   
   spatial_meta <- deps[["spatial_metadata"]]
-  plot_meta <- deps[["plot_metadata"]]
     
   bbox_polygon <- bbox_to_polygon(spatial_meta$bbox, 
                             return_crs = spatial_meta$crs)
   
-  svg_viewbox_limits <- plot_viewbox_limits(bbox_polygon,
-                               width = plot_meta$width, 
-                               height = plot_meta$height, 
-                               pointsize = plot_meta$pointsize)
+  # if `plot_metadata` isn't used, defaults from plot_viewbox_limits are used: 
+  viewbox_args <- append(list(geo = bbox_polygon), deps[["plot_metadata"]])
+  svg_viewbox_limits <- do.call(plot_viewbox_limits, args = viewbox_args)
+                                
   
   saveRDS(svg_viewbox_limits, viz[['location']])
 }
