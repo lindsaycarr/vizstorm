@@ -44,5 +44,19 @@ fetch:
     depends: ["spatial_metadata"]
     comment: sets up the basic view window and projection
 process:
+  - 
+    id: state_geoms_dataframe
+    location: cache/state_geoms_dataframe.rds
+    reader: rds
+    processor: geom_dataframe
+    eval_args:
+      class: I("state")
+      mouseover: "sprintf('hovertext(\"%s\", evt)', name)"
+      mouseout: I("hovertext(\" \")")
+    depends: 
+      clip_box: "viewbox_limits"
+      spatial_data: "state_geoms"
+    scripts: [scripts/process/geom_dataframe.R]
+    
 visualize:
 publish:
