@@ -73,5 +73,14 @@ fetch:
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: viewbox_limits
 process:
+  - 
+    id: precip_grid
+    location: cache/precip_grid.rds
+    reader: rds
+    cell_size: 80000
+    processor: grid_from_mask
+    scripts: [scripts/process/precip_cells.R]
+    depends: 
+      clip_poly: "state_map_data"
 visualize:
 publish:
