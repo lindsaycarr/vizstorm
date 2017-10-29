@@ -22,6 +22,12 @@ info:
     dplyr:
       repo: CRAN
       version: 0.5.0
+    maps:
+      repo: CRAN
+      version: 3.2.0
+    mapdata: 
+      repo: CRAN
+      version: 2.2-6
     sf:
       repo: CRAN
       version: 0.4.3
@@ -53,6 +59,13 @@ fetch:
     location: cache/map_data_states.rds
     reader: rds
     fetcher: map_data_states
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: spatial_metadata
+  -
+    id: map_data_counties
+    location: cache/map_data_counties.rds
+    reader: rds
+    fetcher: map_data_counties
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: spatial_metadata
 process:
