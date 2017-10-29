@@ -28,6 +28,9 @@ info:
     svglite:
       repo: CRAN 
       version: 1.2.0
+    lazyeval:
+      repo: CRAN
+      version: 0.2.0
 parameter:
   -
     id: spatial_metadata
@@ -48,6 +51,13 @@ fetch:
     scripts: [scripts/fetch/viewbox_limits.R]
     depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
+  -
+    id: state_geoms
+    location: cache/state_geoms.rds
+    reader: rds
+    fetcher: state_geoms
+    scripts: [scripts/fetch/fetch.states.R]
+    depends: ["spatial_metadata", "plot_metadata"]
 process:
   - 
     id: state_geoms_dataframe
