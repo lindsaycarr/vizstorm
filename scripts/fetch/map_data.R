@@ -3,14 +3,8 @@ fetchTimestamp.map_data <- vizlab::alwaysCurrent
 #' Gets data for state polygons.
 #' @param viz a vizlab object including a \code{spatial_metadata} parameter input
 #' @details 
-#' Depends on: \code{spatial_metadata} which must include:
-#' /describe{
-#'   \item{bbox}{numeric in xmin, ymin, xmax, ymax order}
-#'}
-#' and optionally: 
-#' /describe{
-#'   \item{crs}{valid crs for \pkg{sf}}
-#' }
+#' Depends on: \code{viewbox_limits}
+#' and arguments to maps::map in \code{fetch_args}
 fetch.map_data <- function(viz){
   deps <- readDepends(viz)
   checkRequired(deps, "viewbox_limits")
