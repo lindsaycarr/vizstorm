@@ -14,7 +14,7 @@
 #' states <- get_map_data_sf(crs="+init=epsg:5070", database="state")
 #' puerto_rico <- get_map_data_sf(crs="+init=epsg:5070", database = "world", region = "Puerto Rico")
 #' counties <- get_map_data_sf(crs="+init=epsg:3857", database = "county")
-#' # maps inputs xlim and ylim can limit the response to be within a lat/lon bounding rectangle
+#' maps inputs xlim and ylim can limit the response to be within a lat/lon bounding rectangle
 #' islands <- get_map_data_sf(crs = "+init=epsg:3857", database = 'mapdata::world2Hires', 
 #'                            regions = "(?!USA)", xlim = c(275, 300), ylim = c(16, 30))
 #'
@@ -25,7 +25,15 @@ get_map_data_sf <- function(..., crs=NULL, within = NULL){
   map_data <- sf::st_as_sf(maps::map(..., fill=TRUE, plot = FALSE))
   if(!is.null(crs)) map_data <- sf::st_transform(map_data, crs)
   if(!is.null(within)) {
-    map_data_clip <- sf::st_intersection(map_data, within)
+    tryCatch({
+      map_data <- sf::st_intersection(map_data, within)
+    }, warning = function(w) {
+      warning(paste("A warning occured when subsetting the source polygons, it was:", w))
+    }, error = function(e) {
+      warning(paste("An error occured when subsetting the source polygons, it was:", e,
+                    "trying to clean the geometry and try again. Check result!"))
+      map_data <- sf::st_intersection(sf::st_buffer(map_data, 0), within)
+    })
   }
   return(map_data)
 }
