@@ -11,16 +11,16 @@
 #' @return \code{data.frame} of class \code{sf} with geometry and ID columns.
 #' 
 #' @example 
-#' states <- get_map_data_sf(crs="+init=epsg:5070", database="state")
-#' puerto_rico <- get_map_data_sf(crs="+init=epsg:5070", database = "world", region = "Puerto Rico")
-#' counties <- get_map_data_sf(crs="+init=epsg:3857", database = "county")
+#' states <- get_map_data(crs="+init=epsg:5070", database="state")
+#' puerto_rico <- get_map_data(crs="+init=epsg:5070", database = "world", region = "Puerto Rico")
+#' counties <- get_map_data(crs="+init=epsg:3857", database = "county")
 #' maps inputs xlim and ylim can limit the response to be within a lat/lon bounding rectangle
-#' islands <- get_map_data_sf(crs = "+init=epsg:3857", database = 'mapdata::world2Hires', 
+#' islands <- get_map_data(crs = "+init=epsg:3857", database = 'mapdata::world2Hires', 
 #'                            regions = "(?!USA)", xlim = c(275, 300), ylim = c(16, 30))
 #'
 #'# A polygon in a particular projection can also be used.
 #' bbox <- bbox_to_polygon(c(-87, 21, -70, 34), return_crs = "+init=epsg:3857")
-#' storm_counties <- get_map_data_sf(database = "counties", crs = "+init=epsg:3857", within = bbox)
+#' storm_counties <- get_map_data(database = "counties", crs = "+init=epsg:3857", within = bbox)
 get_map_data <- function(..., crs=NULL, within = NULL){
   
   map_data <- sf::st_as_sf(maps::map(..., fill=TRUE, plot = FALSE))
