@@ -1,4 +1,4 @@
-fetchTimestamp.map_data_states <- fetchTimestamp.map_data_counties <- vizlab::alwaysCurrent
+fetchTimestamp.map_data <- vizlab::alwaysCurrent
 
 #' Gets data for state polygons.
 #' @param viz a vizlab object including a \code{spatial_metadata} parameter input
@@ -11,32 +11,15 @@ fetchTimestamp.map_data_states <- fetchTimestamp.map_data_counties <- vizlab::al
 #' /describe{
 #'   \item{crs}{valid crs for \pkg{sf}}
 #' }
-fetch.map_data_states <- function(viz = as.viz("map_data_states")){
-
-  sm <- spatial_meta(viz)
-  
-  saveRDS(get_map_data_sf(database = 'state', 
-                          crs = sm$crs, 
-                          within = sm["bbox_polygon"]), 
-          viz[['location']])
-  }
-
-#' Gets data for county polygons.
-fetch.map_data_counties <- function(viz = as.viz("map_data_counties")){
-  
-  sm <- spatial_meta(viz)
-  
-  saveRDS(get_map_data_sf(database = 'county', 
-                          crs = sm$crs, 
-                          within = sm["bbox_polygon"]), 
-          viz[['location']])
-}
-
-spatial_meta <- function(viz) {
+fetch.map_data <- function(viz){
   deps <- readDepends(viz)
-  checkRequired(deps, "spatial_metadata")
-  spatial_meta <- deps[["spatial_metadata"]]
-  spatial_meta$bbox_polygon <- bbox_to_polygon(spatial_meta$bbox,
-                                               return_crs = spatial_meta$crs)
-  return(spatial_meta)
+  checkRequired(deps, "viewbox_limits")
+  viewbox <- deps[["viewbox_limits"]]
+  
+  viewbox_args <- list(crs=sf::st_crs(viewbox), within = viewbox)
+  map_args <- append(viz$fetch_args, viewbox_args)
+  map_data <- do.call(get_map_data, args = map_args)
+  
+  saveRDS(map_data, viz[['location']])
 }
+

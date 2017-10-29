@@ -55,19 +55,23 @@ fetch:
     depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
   -
-    id: map_data_states
-    location: cache/map_data_states.rds
+    id: state_map_data
+    location: cache/state_map_data.rds
     reader: rds
-    fetcher: map_data_states
+    fetcher: map_data
+    fetch_args:
+      database: state
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
-    depends: spatial_metadata
+    depends: viewbox_limits
   -
-    id: map_data_counties
-    location: cache/map_data_counties.rds
+    id: county_map_data
+    location: cache/county_map_data.rds
     reader: rds
-    fetcher: map_data_counties
+    fetcher: map_data
+    fetch_args:
+      database: county
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
-    depends: spatial_metadata
+    depends: viewbox_limits
 process:
 visualize:
 publish:
