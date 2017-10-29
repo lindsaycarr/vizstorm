@@ -49,7 +49,7 @@ fetchTimestamp.viewbox_limits <- vizlab::alwaysCurrent
 #' for lat/long
 #' @return an object of class 'bbox' from sf::
 #' @example 
-#' bbox <- cbbox_to_polygon(c(-87, 21, -70, 34), return_crs = "+init=epsg:5070")
+#' bbox <- bbox_to_polygon(c(-87, 21, -70, 34), return_crs = "+init=epsg:5070")
 bbox_to_polygon <- function(bbox, bbox_crs = "+init=epsg:4326", return_crs = NULL) {
   bbox_poly <- sf::st_sfc(sf::st_polygon(list(
     matrix(
