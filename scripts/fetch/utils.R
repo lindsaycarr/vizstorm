@@ -24,7 +24,9 @@
 get_map_data <- function(..., crs=NULL, within = NULL){
   
   map_data <- sf::st_as_sf(maps::map(..., fill=TRUE, plot = FALSE))
-  if(!is.null(crs)) map_data <- sf::st_transform(map_data, crs)
+  if(!is.null(crs)) {
+    map_data <- sf::st_transform(map_data, crs)
+  }
   if(!is.null(within)) {
     map_data <- tryCatch({
       map_data <- sf::st_intersection(map_data, within)
