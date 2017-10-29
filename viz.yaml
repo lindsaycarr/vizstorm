@@ -22,6 +22,12 @@ info:
     dplyr:
       repo: CRAN
       version: 0.5.0
+    maps:
+      repo: CRAN
+      version: 3.2.0
+    mapdata: 
+      repo: CRAN
+      version: 2.2-6
     sf:
       repo: CRAN
       version: 0.4.3
@@ -32,7 +38,12 @@ parameter:
   -
     id: spatial_metadata
     crs: '+init=epsg:2163'
-    bbox: [-120, 30, -74, 42]
+    bbox: [-87, 21, -70, 34]
+  -
+    id: plot_metadata
+    height: 5
+    width: 8
+    pointsize: 12
 
 fetch:
   -
@@ -40,9 +51,23 @@ fetch:
     location: cache/viewbox_limits.rds
     reader: rds
     fetcher: viewbox_limits
-    scripts: [scripts/fetch/viewbox_limits.R]
-    depends: ["spatial_metadata"]
+    scripts: [scripts/fetch/viewbox_limits.R , scripts/fetch/utils.R]
+    depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
+  -
+    id: map_data_states
+    location: cache/map_data_states.rds
+    reader: rds
+    fetcher: map_data_states
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: spatial_metadata
+  -
+    id: map_data_counties
+    location: cache/map_data_counties.rds
+    reader: rds
+    fetcher: map_data_counties
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: spatial_metadata
 process:
 visualize:
 publish:
