@@ -34,9 +34,6 @@ info:
     svglite:
       repo: CRAN 
       version: 1.2.0
-    lazyeval:
-      repo: CRAN
-      version: 0.2.0
 parameter:
   -
     id: spatial_metadata
@@ -103,10 +100,10 @@ process:
     location: cache/state_geoms_dataframe.rds
     reader: rds
     processor: geom_dataframe
-    eval_args:
-      class: I("state")
-      mouseover: "sprintf('hovertext(\"%s\", evt)', ID)"
-      mouseout: I("hovertext(\" \")")
+    attributes:
+      class: state
+      mouseover: hovertext('{ID}', evt)
+      mouseout: hovertext(' ')
     depends: 
       clip_box: "viewbox_limits"
       spatial_data: "state_map_data"

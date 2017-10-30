@@ -4,8 +4,8 @@
 #' @details 
 #' This function takes a single required dependency, which is `spatial_data`
 #' Presently, `spatial_data` is Spatial{X}DataFrame, but this will be updated to `sf`
-#' if `eval_args` are present, they are used to convert the `data` slot by evaluating
-#' simple functions w/ variables in `data` (skipped if `eval_args` isn't present)
+#' if `attributes` are present, they are used to convert the `data` slot by evaluating
+#' simple functions w/ variables in `data` (skipped if `attributes` isn't present)
 #' if `clip_box` is present as a dependency, it is used to clip the geometries in 
 #' `spatial_data`
 #' See `eval_data.frame` function 
@@ -21,38 +21,27 @@ process.geom_dataframe <- function(viz){
     message('process.geom_dataframe clipping is not implemented yet')
   }
   
-  eval_args <- viz[['eval_args']]
-  if (!is.null(eval_args)){
-    args <- append(
-      list(data_in = geom_dataframe), 
-      eval_args)
-    data_out <- do.call(eval_data.frame, args = args)
+  attributes <- viz[['attributes']]
+
+  if (!is.null(attributes)){
+    geom_dataframe[names(attributes)] <- attributes
+    sub_required <- sapply(attributes, grepl, pattern = '\\{(.*?)\\}')
+    complex_attrs <- names(sub_required)[sub_required]
     
-    # then return the geom w/ the new data.frame w/ it
-    geom_dataframe[names(data_out)] <- data_out
+    subbed_attrs <- sapply(complex_attrs, FUN = function(x) {
+      sub_attribute_text(attribute = x, data = geom_dataframe, attributes[[x]])
+    })
+    geom_dataframe[names(subbed_attrs)] <- subbed_attrs
     # should we drop data that was in geom_dataframe but not data_out?
   }
   
   saveRDS(geom_dataframe, file = viz[['location']])
 }
 
-#' takes data_in and creates a data.frame that has attributes ready for svg
-#' 
-#' @param data_in a data.frame of information to be used by functions. 
-#' nrow of data_in will be the length of data_out
-#' @param \dots named arguments that can be evaluated with variables in \code{data_in}
-#' 
-#' @example{
-#' data_in <- data.frame(name = c('california','colorado'))
-#' eval_data.frame(data_in, class=I('state'), mouseover = "sprintf('hovertext(\"%s\", evt)', name)")
-#' }
-eval_data.frame <- function(data_in, ...){
-  
-  dots <- lazyeval::lazy_dots(...)
-  element_args <- sapply(dots, FUN = function(dot){
-    lazyeval::lazy_eval(dot$expr, data = data_in)
-  })
-  return(as.data.frame(element_args))
-  
-  
+# does this work for "hovertext('{ID}-{dog}' evt)"
+sub_attribute_text <- function(attribute, data, template){
+  sprint_fmt <- gsub(x = template, pattern = '\\{(.*?)\\}', replacement = '%s')
+  data_col <- gsub("[\\{\\}]", "", regmatches(template, gregexpr("\\{.*?\\}", template))[[1]])
+  stopifnot(length(data_col) <= 1)
+  sapply(data[[data_col]], FUN = function(x) sprintf(sprint_fmt, x), USE.NAMES = FALSE)
 }
