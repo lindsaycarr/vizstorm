@@ -22,6 +22,12 @@ info:
     dplyr:
       repo: CRAN
       version: 0.5.0
+    maps:
+      repo: CRAN
+      version: 3.2.0
+    mapdata: 
+      repo: CRAN
+      version: 2.2-6
     sf:
       repo: CRAN
       version: 0.4.3
@@ -32,7 +38,7 @@ parameter:
   -
     id: spatial_metadata
     crs: '+init=epsg:2163'
-    bbox: [-120, 30, -74, 42]
+    bbox: [-87, 21, -70, 34]
   -
     id: plot_metadata
     height: 5
@@ -45,9 +51,49 @@ fetch:
     location: cache/viewbox_limits.rds
     reader: rds
     fetcher: viewbox_limits
-    scripts: [scripts/fetch/viewbox_limits.R]
+    scripts: [scripts/fetch/viewbox_limits.R , scripts/fetch/utils.R]
     depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
+  -
+    id: state_map_data
+    location: cache/state_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: state
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
+  -
+    id: county_map_data
+    location: cache/county_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: county
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
+  -
+    id: puerto_rico_map_data
+    location: cache/puerto_rico_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: world
+      region: "Puerto Rico"
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
+  -
+    id: islands_map_data
+    location: cache/islands_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: mapdata::world2Hires
+      regions: "(?!USA)"
+      xlim: [275, 300]
+      ylim: [16, 30]
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
 process:
 visualize:
 publish:
