@@ -64,6 +64,15 @@ fetch:
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: viewbox_limits
   -
+    id: precip_grid_data
+    location: cache/precip_grid_data.rds
+    reader: rds
+    fetcher: precip_grid_data
+    scripts: scripts/fetch/precip_grid_data.R
+    depends: 
+      grid: precip_grid
+    
+  -
     id: county_map_data
     location: cache/county_map_data.rds
     reader: rds
