@@ -28,13 +28,7 @@ get_map_data <- function(..., crs=NULL, within = NULL){
     map_data <- sf::st_transform(map_data, crs)
   }
   if(!is.null(within)) {
-    map_data <- tryCatch({
-      map_data <- sf::st_intersection(map_data, within)
-    }, error = function(e) {
-      warning(paste("An error occured when subsetting the source polygons, it was:", e,
-                    "trying to clean the geometry and try again. Check result!"))
-      return(sf::st_intersection(sf::st_buffer(map_data, 0), within))
-    })
+    map_data <- map_data[sf::st_intersects(map_data, within, sparse = F),]
   }
   return(map_data)
 }

@@ -72,6 +72,28 @@ fetch:
       database: county
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: viewbox_limits
+  -
+    id: puerto_rico_map_data
+    location: cache/puerto_rico_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: world
+      region: "Puerto Rico"
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
+  -
+    id: islands_map_data
+    location: cache/islands_map_data.rds
+    reader: rds
+    fetcher: map_data
+    fetch_args:
+      database: mapdata::world2Hires
+      regions: "(?!USA)"
+      xlim: [275, 300]
+      ylim: [16, 30]
+    scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
+    depends: viewbox_limits
 process:
   - 
     id: precip_grid
