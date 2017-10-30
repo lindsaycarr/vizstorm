@@ -17,8 +17,8 @@ process.grid_from_mask <- function(viz){
   cell_size <- viz[["cell_size"]]
   
   # this is a simple way to dissolve multiple polygons into a single mask
-  clip_mask <- clip_poly %>% 
-    mutate(group=1) %>% group_by(group) %>% summarise()
+  clip_mask <- clip_poly %>% st_buffer(dist = 0) %>% 
+    mutate(group='mask') %>% group_by(group) %>% summarise()
   cell_grid <- sf::st_make_grid(clip_mask, cellsize = cell_size, crs = crs)
   cell_grid_clipped <- sf::st_intersection(cell_grid, clip_mask)
   
