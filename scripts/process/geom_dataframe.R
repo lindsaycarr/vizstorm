@@ -24,12 +24,13 @@ process.geom_dataframe <- function(viz){
   eval_args <- viz[['eval_args']]
   if (!is.null(eval_args)){
     args <- append(
-      list(data_in = geom_dataframe@data), 
+      list(data_in = geom_dataframe), 
       eval_args)
     data_out <- do.call(eval_data.frame, args = args)
     
     # then return the geom w/ the new data.frame w/ it
-    geom_dataframe@data <- data_out
+    geom_dataframe[names(data_out)] <- data_out
+    # should we drop data that was in geom_dataframe but not data_out?
   }
   
   saveRDS(geom_dataframe, file = viz[['location']])

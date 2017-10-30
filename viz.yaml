@@ -58,14 +58,6 @@ fetch:
     depends: ["spatial_metadata", "plot_metadata"]
     comment: sets up the basic view window and projection
   -
-<<<<<<< HEAD
-    id: state_geoms
-    location: cache/state_geoms.rds
-    reader: rds
-    fetcher: state_geoms
-    scripts: [scripts/fetch/fetch.states.R]
-    depends: ["spatial_metadata", "plot_metadata"]
-=======
     id: state_map_data
     location: cache/state_map_data.rds
     reader: rds
@@ -105,7 +97,6 @@ fetch:
       ylim: [16, 30]
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: viewbox_limits
->>>>>>> 538edd713fd1f6fbf802f9a8aa631250ff6e8c7e
 process:
   - 
     id: state_geoms_dataframe
@@ -114,11 +105,11 @@ process:
     processor: geom_dataframe
     eval_args:
       class: I("state")
-      mouseover: "sprintf('hovertext(\"%s\", evt)', name)"
+      mouseover: "sprintf('hovertext(\"%s\", evt)', ID)"
       mouseout: I("hovertext(\" \")")
     depends: 
       clip_box: "viewbox_limits"
-      spatial_data: "state_geoms"
+      spatial_data: "state_map_data"
     scripts: [scripts/process/geom_dataframe.R]
     
 visualize:
