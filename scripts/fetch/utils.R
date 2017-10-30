@@ -11,26 +11,29 @@
 #' @return \code{data.frame} of class \code{sf} with geometry and ID columns.
 #' 
 #' @example 
-#' states <- get_map_data_sf(crs="+init=epsg:5070", database="state")
-#' puerto_rico <- get_map_data_sf(crs="+init=epsg:5070", database = "world", region = "Puerto Rico")
-#' counties <- get_map_data_sf(crs="+init=epsg:3857", database = "county")
+#' states <- get_map_data(crs="+init=epsg:5070", database="state")
+#' puerto_rico <- get_map_data(crs="+init=epsg:5070", database = "world", region = "Puerto Rico")
+#' counties <- get_map_data(crs="+init=epsg:3857", database = "county")
 #' maps inputs xlim and ylim can limit the response to be within a lat/lon bounding rectangle
-#' islands <- get_map_data_sf(crs = "+init=epsg:3857", database = 'mapdata::world2Hires', 
+#' islands <- get_map_data(crs = "+init=epsg:3857", database = 'mapdata::world2Hires', 
 #'                            regions = "(?!USA)", xlim = c(275, 300), ylim = c(16, 30))
 #'
 #'# A polygon in a particular projection can also be used.
 #' bbox <- bbox_to_polygon(c(-87, 21, -70, 34), return_crs = "+init=epsg:3857")
-#' storm_counties <- get_map_data_sf(database = "counties", crs = "+init=epsg:3857", within = bbox)
-get_map_data_sf <- function(..., crs=NULL, within = NULL){
+#' storm_counties <- get_map_data(database = "counties", crs = "+init=epsg:3857", within = bbox)
+get_map_data <- function(..., crs=NULL, within = NULL){
+  
   map_data <- sf::st_as_sf(maps::map(..., fill=TRUE, plot = FALSE))
-  if(!is.null(crs)) map_data <- sf::st_transform(map_data, crs)
+  if(!is.null(crs)) {
+    map_data <- sf::st_transform(map_data, crs)
+  }
   if(!is.null(within)) {
     map_data <- tryCatch({
-      map_data <- sf::st_intersection(map_data, within[[1]])
+      map_data <- sf::st_intersection(map_data, within)
     }, error = function(e) {
       warning(paste("An error occured when subsetting the source polygons, it was:", e,
                     "trying to clean the geometry and try again. Check result!"))
-      return(sf::st_intersection(sf::st_buffer(map_data, 0), within[[1]]))
+      return(sf::st_intersection(sf::st_buffer(map_data, 0), within))
     })
   }
   return(map_data)
@@ -74,7 +77,7 @@ bbox_to_polygon <- function(bbox, bbox_crs = "+init=epsg:4326", return_crs = NUL
 #' @param height the height (in inches) of the svg view
 #' @param pointsize number of pixels per inch
 #' 
-#' @return a list of limits, named w/ `xlim` and `ylim`
+#' @return an sfc polygon of the viewbox limits
 
 plot_viewbox_limits <- function(geo, ...){
   
@@ -86,8 +89,8 @@ plot_viewbox_limits <- function(geo, ...){
   }
   usr <- par('usr')
   dev.off()
-  xlim = usr[c(1,2)]
-  ylim = usr[c(3,4)]
   
-  return(list(xlim = xlim, ylim = ylim))
+  viewbox <- bbox_to_polygon(usr[c(1, 3, 2, 4)], bbox_crs = sf::st_crs(geo))
+  
+  return(viewbox)
 }
