@@ -79,7 +79,7 @@ process:
     reader: rds
     cell_size: 80000
     processor: grid_from_mask
-    scripts: [scripts/process/precip_cells.R]
+    scripts: [scripts/process/grid_from_mask.R]
     depends: 
       clip_poly: "state_map_data"
 visualize:
