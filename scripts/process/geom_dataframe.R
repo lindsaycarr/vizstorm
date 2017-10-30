@@ -31,10 +31,10 @@ process.geom_dataframe <- function(viz){
     subbed_attrs <- sapply(complex_attrs, FUN = function(x) {
       sub_attribute_text(attribute = x, data = geom_dataframe, attributes[[x]])
     })
-    geom_dataframe[names(subbed_attrs)] <- subbed_attrs
+    
+    geom_dataframe[complex_attrs] <- subbed_attrs
     # should we drop data that was in geom_dataframe but not data_out?
   }
-  
   saveRDS(geom_dataframe, file = viz[['location']])
 }
 
