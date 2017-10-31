@@ -3,9 +3,11 @@
 #' 
 #' @details 
 #' This function takes a single required dependency, which is `spatial_data`
-#' Presently, `spatial_data` is Spatial{X}DataFrame, but this will be updated to `sf`
-#' if `attributes` are present, they are used to convert the `data` slot by evaluating
-#' simple functions w/ variables in `data` (skipped if `attributes` isn't present)
+#' Presently, `spatial_data` is an `sf` object.
+#' if `attributes` are present, they are used to add to or modify the `data.frame` 
+#' in `spatial_data`. Supported operations are specifying a string to be repeated, or 
+#' a string substitution using information from another column with the "{variable}" 
+#' syntaxt. This operation is skipped if `attributes` isn't present.
 #' if `clip_box` is present as a dependency, it is used to clip the geometries in 
 #' `spatial_data`
 #' See `eval_data.frame` function 
