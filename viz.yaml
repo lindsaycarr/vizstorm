@@ -37,6 +37,9 @@ info:
     sp:
       repo: CRAN
       version: 1.2.5
+    geoknife:
+      repo: GRAN
+      version: 1.6.0
 parameter:
   -
     id: spatial_metadata
@@ -72,6 +75,11 @@ fetch:
     reader: rds
     fetcher: precip_grid_data
     scripts: scripts/fetch/precip_grid_data.R
+    webdata_args:
+      times: ["2014-01-01", "2014-01-04"]
+      url: "https://cida.usgs.gov/thredds/dodsC/stageiv_combined"
+      variables: "Total_precipitation_surface_1_Hour_Accumulation"
+    comment: "times and other metadata will be moved to another target, e.g., timesteps"
     depends: 
       grid: precip_grid
     
