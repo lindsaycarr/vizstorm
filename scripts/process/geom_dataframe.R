@@ -21,12 +21,14 @@ process.geom_dataframe <- function(viz){
   if (!is.null(deps[['clip_box']])){
     # remove all polygons that are outside the box
     # trim all polgons that overlap the box
-    message('process.geom_dataframe clipping is not implemented yet')
+    geom_dataframe <- st_intersection(st_buffer(geom_dataframe, 0), deps[['clip_box']])
   }
   
   attributes <- viz[['attributes']]
 
   if (!is.null(attributes)){
+    # replace existing attributes w/ these user-specified ones
+    # evaluate "mustache" keys w/ geom_df
     attr_names <- names(attributes)
     
     # if mustache keys exist, evaluate with the context of the geom_dataframe variables:
