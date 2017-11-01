@@ -1,19 +1,23 @@
 
 
-fetch.precip_grid_data <- function(viz){
-  deps <- readDepends(viz)
-  checkRequired(deps, c("grid"))
-  grid <- deps[['grid']]
-  sp_grid <- as(grid, "Spatial")
-  sp_grid_WGS84 <- sp::spTransform(sp_grid, "+proj=longlat +datum=WGS84")
+fetch.noaa_precip_gdp <- function(viz){
+  # NOAA stage IV precip:
+  url <- "https://cida.usgs.gov/thredds/dodsC/stageiv_combined"
+  variables <- "Total_precipitation_surface_1_Hour_Accumulation"
   
-  stencil <- geoknife::simplegeom(sp_grid_WGS84)
-  fabric_args <- viz[["webdata_args"]]
+  deps <- readDepends(viz)
+  checkRequired(deps, c("sf_stencil", "time_info"))
+  times <- c(deps[["time_info"]]$start, deps[["time_info"]]$stop)
+  sf_stencil <- deps[['sf_stencil']]
+  sp_stencil <- as(sf_stencil, "Spatial")
+  sp_stencil_WGS84 <- sp::spTransform(sp_stencil, "+proj=longlat +datum=WGS84")
+  
+  stencil <- geoknife::simplegeom(sp_stencil_WGS84)
   
   fabric <- geoknife::webdata(
-    url = fabric_args$url, 
-    times = as.POSIXct(fabric_args$times), 
-    variables = fabric_args$variables
+    url = url,
+    times = times, 
+    variables = variables
   )
   
   job <- geoknife::geoknife(stencil, fabric, wait = TRUE, REQUIRE_FULL_COVERAGE=FALSE)

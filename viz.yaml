@@ -50,6 +50,11 @@ parameter:
     height: 5
     width: 8
     pointsize: 12
+  -
+    id: animate
+    start: "2014-01-01"
+    stop: "2014-01-04"
+    step: "hour"
 
 fetch:
   -
@@ -73,16 +78,11 @@ fetch:
     id: precip_grid_data
     location: cache/precip_grid_data.rds
     reader: rds
-    fetcher: precip_grid_data
+    fetcher: noaa_precip_gdp
     scripts: scripts/fetch/precip_grid_data.R
-    webdata_args:
-      times: ["2014-01-01", "2014-01-04"]
-      url: "https://cida.usgs.gov/thredds/dodsC/stageiv_combined"
-      variables: "Total_precipitation_surface_1_Hour_Accumulation"
-    comment: "times and other metadata will be moved to another target, e.g., timesteps"
     depends: 
-      grid: precip_grid
-    
+      sf_stencil: precip_grid
+      time_info: animate
   -
     id: county_map_data
     location: cache/county_map_data.rds
