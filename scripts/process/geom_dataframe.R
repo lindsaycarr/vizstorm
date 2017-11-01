@@ -4,13 +4,14 @@
 #' @details 
 #' This function takes a single required dependency, which is `spatial_data`
 #' Presently, `spatial_data` is an `sf` object.
-#' if `attributes` are present, they are used to add to or modify the `data.frame` 
+#' if `attributes` are present, they are used to add to or modify the `data.frame`, and 
+#' they are the only variables included in the return data (other than `geometry`).
 #' in `spatial_data`. Supported operations are specifying a string to be repeated, or 
-#' a string substitution using information from another column with the "{variable}" 
-#' syntaxt. This operation is skipped if `attributes` isn't present.
+#' a string substitution using information from another column with the "{{variable}}" 
+#' (`mustache`) syntax. This operation is skipped if `attributes` isn't present.
 #' if `clip_box` is present as a dependency, it is used to clip the geometries in 
 #' `spatial_data`
-#' See `eval_data.frame` function 
+#' See `sub_attribute_texte` function.
 process.geom_dataframe <- function(viz){
   deps <- readDepends(viz)
   checkRequired(deps, 'spatial_data') # spatial data is the only required depends
@@ -26,24 +27,40 @@ process.geom_dataframe <- function(viz){
   attributes <- viz[['attributes']]
 
   if (!is.null(attributes)){
-    geom_dataframe[names(attributes)] <- attributes
-    sub_required <- sapply(attributes, grepl, pattern = '\\{(.*?)\\}')
-    complex_attrs <- names(sub_required)[sub_required]
+    attr_names <- names(attributes)
     
-    subbed_attrs <- sapply(complex_attrs, FUN = function(x) {
-      sub_attribute_text(attribute = x, data = geom_dataframe, attributes[[x]])
+    # if mustache keys exist, evaluate with the context of the geom_dataframe variables:
+    attrs_subbed <- sapply(attr_names, FUN = function(x) {
+      sub_attribute_text(template = attributes[[x]], data = geom_dataframe)
     })
     
-    geom_dataframe[complex_attrs] <- subbed_attrs
-    # should we drop data that was in geom_dataframe but not data_out?
+    geom_dataframe[attr_names] <- attrs_subbed
+    # dropping data that was in geom_dataframe but not data_out:
+    geom_dataframe <- select_(geom_dataframe, .dots = attr_names)
   }
+  
   saveRDS(geom_dataframe, file = viz[['location']])
 }
 
-# does this work for "hovertext('{ID}-{dog}' evt)"
-sub_attribute_text <- function(attribute, data, template){
-  sprint_fmt <- gsub(x = template, pattern = '\\{(.*?)\\}', replacement = '%s')
-  data_col <- gsub("[\\{\\}]", "", regmatches(template, gregexpr("\\{.*?\\}", template))[[1]])
-  stopifnot(length(data_col) <= 1)
-  sapply(data[[data_col]], FUN = function(x) sprintf(sprint_fmt, x), USE.NAMES = FALSE)
+#' Sub mustache keys into text
+#' 
+#' Use mustache templates to sub data.frame values into 
+#' strings. 
+#' 
+#' @param template a `template` per `whisker::whisker.render`: 
+#' "character with template text"
+#' @param data a data.frame with variables used for whisker rendering
+#' @details this function evaluates the render function row-wise. 
+#' Multiple keys can be combined in single template (see example). Per 
+#' whisker pkg, keys that don't have variables in `data` evaluate to empty 
+#' strings (no errors).
+#' @example 
+#' sub_attribute_text("hovertext('{{ID}}-{{dog}}' evt)", 
+#'    data.frame(ID = c('g','f'), dog = c('ralph','cindy')))
+#' 
+#' @return a character vector of length nrow(data)
+sub_attribute_text <- function(template, data){
+  sapply(seq_len(nrow(data)), FUN = function(j) {
+    whisker::whisker.render(template, data = data[j,])
+    }, USE.NAMES = FALSE)
 }
