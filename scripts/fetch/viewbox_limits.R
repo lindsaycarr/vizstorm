@@ -36,3 +36,4 @@ fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
 }
 
 fetchTimestamp.viewbox_limits <- vizlab::alwaysCurrent
+
