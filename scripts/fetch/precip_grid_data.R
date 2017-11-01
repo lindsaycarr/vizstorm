@@ -7,6 +7,7 @@ fetch.noaa_precip_gdp <- function(viz){
   
   deps <- readDepends(viz)
   checkRequired(deps, c("sf_stencil", "time_info"))
+  checkRequired(deps[["time_info"]], c("start", "stop"))
   times <- c(deps[["time_info"]]$start, deps[["time_info"]]$stop)
   sf_stencil <- deps[['sf_stencil']]
   sp_stencil <- as(sf_stencil, "Spatial")
