@@ -11,7 +11,7 @@
 #' (`mustache`) syntax. This operation is skipped if `attributes` isn't present.
 #' if `clip_box` is present as a dependency, it is used to clip the geometries in 
 #' `spatial_data`
-#' See `sub_attribute_texte` function.
+#' See `sub_attribute_text` function.
 process.geom_dataframe <- function(viz){
   deps <- readDepends(viz)
   checkRequired(deps, 'spatial_data') # spatial data is the only required depends
@@ -37,7 +37,7 @@ process.geom_dataframe <- function(viz){
     })
     
     geom_dataframe[attr_names] <- attrs_subbed
-    # dropping data that was in geom_dataframe but not data_out:
+    # dropping data that was in geom_dataframe but not attributes:
     geom_dataframe <- select_(geom_dataframe, .dots = attr_names)
   }
   
