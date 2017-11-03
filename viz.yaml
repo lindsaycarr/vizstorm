@@ -133,8 +133,8 @@ process:
       id: '{{ID}}' 
       class: 'precip-cell'
     depends: 
-      clip_box: "precip_grid"
-      spatial_data: "state_map_data"
+      clip_box: "viewbox_limits"
+      spatial_data: "precip_grid"
     scripts: [scripts/process/geom_dataframe.R]
   - 
     id: state_geoms_dataframe
