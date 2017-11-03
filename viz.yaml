@@ -125,6 +125,18 @@ process:
     depends: 
       clip_poly: "state_map_data"
   - 
+    id: precip_geoms_dataframe
+    location: cache/precip_geoms_dataframe.rds
+    reader: rds
+    processor: sfc_to_svg
+    attributes:
+      id: '{{ID}}' 
+      class: 'precip-cell'
+    depends: 
+      clip_box: "precip_grid"
+      spatial_data: "state_map_data"
+    scripts: [scripts/process/geom_dataframe.R]
+  - 
     id: state_geoms_dataframe
     location: cache/state_geoms_dataframe.rds
     reader: rds
@@ -191,6 +203,7 @@ visualize:
     depends: 
       pr-style: pr_geoms_dataframe
       states-style: state_style_dataframe
+      precip-cells: precip_geoms_dataframe
     scripts: scripts/something.here.R
   -
     id: svg_map_mouse
