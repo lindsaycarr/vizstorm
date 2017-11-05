@@ -26,3 +26,8 @@ fetch.noaa_precip_gdp <- function(viz){
   data <- geoknife::result(job, with.units = TRUE)
   saveRDS(data, file = viz[['location']])
 }
+
+fetchTimestamp.noaa_precip_gdp <- function(viz){
+  warning('need to implement something that checks `query(webdata, "times")` to see if new data is available')
+  vizlab::alwaysCurrent(viz)
+}

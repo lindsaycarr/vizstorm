@@ -40,6 +40,9 @@ info:
     geoknife:
       repo: GRAN
       version: 1.6.0
+    xml2:
+      repo: CRAN
+      version: 1.1.1
 parameter:
   -
     id: spatial_metadata
@@ -75,13 +78,13 @@ fetch:
     scripts: [scripts/fetch/map_data.R , scripts/fetch/utils.R]
     depends: viewbox_limits
   -
-    id: precip_grid_data
-    location: cache/precip_grid_data.rds
+    id: precip_cell_data
+    location: cache/precip_cell_data.rds
     reader: rds
     fetcher: noaa_precip_gdp
-    scripts: scripts/fetch/precip_grid_data.R
+    scripts: scripts/fetch/precip_cell_data.R
     depends: 
-      sf_stencil: precip_grid
+      sf_stencil: precip_cells
       time_info: animate
   -
     id: county_map_data
@@ -116,103 +119,98 @@ fetch:
     depends: viewbox_limits
 process:
   -
-    id: precip_grid
-    location: cache/precip_grid.rds
+    id: precip_cells
+    location: cache/precip_cells.rds
     reader: rds
     cell_size: 80000
-    processor: grid_from_mask
-    scripts: [scripts/process/grid_from_mask.R]
+    processor: cells_from_mask
+    scripts: [scripts/process/cells_from_mask.R]
     depends: 
-      clip_poly: "state_map_data"
+      mask_poly: "state_map_data"
   - 
-    id: precip_geoms_dataframe
-    location: cache/precip_geoms_dataframe.rds
+    id: precip_polygons_svg
+    location: cache/precip_polygons_svg.rds
     reader: rds
-    processor: sfc_to_svg
+    processor: as_svg_path
     attributes:
       id: '{{ID}}' 
       class: 'precip-cell'
     depends: 
-      clip_box: "viewbox_limits"
-      spatial_data: "precip_grid"
-    scripts: [scripts/process/geom_dataframe.R]
+      data: "precip_cells"
+    scripts: [scripts/process/as_svg.R]
   - 
-    id: state_geoms_dataframe
-    location: cache/state_geoms_dataframe.rds
+    id: state_polygons_svg
+    location: cache/state_polygons_svg.rds
     reader: rds
-    processor: sfc_to_svg
+    processor: as_svg_path
     attributes:
       id: '{{ID}}-geom' 
     depends: 
-      clip_box: "viewbox_limits"
-      spatial_data: "state_map_data"
-    scripts: [scripts/process/geom_dataframe.R]
+      data: "state_map_data"
+      clip_box: viewbox_limits
+    scripts: [scripts/process/as_svg.R]
   - 
-    id: pr_geoms_dataframe
-    location: cache/pr_geoms_dataframe.rds
+    id: pr_polygons_svg
+    location: cache/pr_polygons_svg.rds
     reader: rds
-    processor: sfc_to_svg
+    processor: as_svg_path
     attributes:
       class: island
     depends: 
-      clip_box: "viewbox_limits"
-      spatial_data: "puerto_rico_map_data"
-    scripts: [scripts/process/geom_dataframe.R]
+      data: "puerto_rico_map_data"
+    scripts: [scripts/process/as_svg.R]
   - 
-    id: state_style_dataframe
+    id: state_style_svg
     location: cache/state_style_dataframe.rds
     reader: rds
-    processor: dataframe_to_svg
+    processor: as_svg_use
     attributes:
       class: state
       href: '#{{ID}}-geom'
       id: '{{ID}}'
     depends: 
-      clip_box: "viewbox_limits"
-      spatial_data: "state_map_data"
-    scripts: [scripts/process/geom_dataframe.R]  
+      data: "state_map_data"
+    scripts: [scripts/process/as_svg.R]  
   - 
-    id: state_mouse_dataframe
+    id: state_mouse_svg
     location: cache/state_mouse_dataframe.rds
     reader: rds
-    processor: dataframe_to_svg
+    processor: as_svg_use
     attributes:
       onmouseover: hovertext('{{ID}}', evt)
       onmouseout: hovertext(' ')
       class: mouseover
       href: '#{{ID}}-geom'
     depends: 
-      clip_box: "viewbox_limits"
-      spatial_data: "state_map_data"
-    scripts: [scripts/process/geom_dataframe.R] 
-
-visualize:
+      data: "state_map_data"
+    scripts: [scripts/process/as_svg.R] 
   -
     id: svg_defs
     location: cache/svg_defs.rds
-    visualizer: svg_defs
+    visualizer: as_svg_defs
     reader: rds
     depends: 
-      states-geoms: state_geoms_dataframe
-    scripts: scripts/something.here.R
+      states-geoms: state_polygons_svg
+    scripts: [scripts/process/as_svg.R] 
   -
     id: svg_map_style
     location: cache/svg_map_style.rds
-    visualizer: svg_g
+    visualizer: as_svg_g
     reader: rds
     depends: 
-      pr-style: pr_geoms_dataframe
-      states-style: state_style_dataframe
-      precip-cells: precip_geoms_dataframe
-    scripts: scripts/something.here.R
+      pr-style: pr_polygons_svg
+      states-style: state_style_svg
+      precip-cells: precip_polygons_svg
+    scripts: [scripts/process/as_svg.R] 
   -
     id: svg_map_mouse
     location: cache/svg_map_mouse.rds
-    visualizer: svg_g
+    visualizer: as_svg_g
     reader: rds
     depends: 
-      states-mouse: state_mouse_dataframe
-    scripts: scripts/something.here.R
+      states-mouse: state_mouse_svg
+    scripts: [scripts/process/as_svg.R] 
+visualize:
   -
     id: svg_skeleton
     location: cache/svg_skeleton.svg

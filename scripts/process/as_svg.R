@@ -66,3 +66,82 @@ sub_attribute_text <- function(template, data){
     whisker::whisker.render(template, data = data[j,])
     }, USE.NAMES = FALSE)
 }
+
+sfc_to_d <- function(sfc_object, xlim, ylim, ...){
+  stopifnot(packageVersion('svglite') == '1.2.0.9003')
+  # do the svg thing here:
+  width = 8
+  height = 5
+  pointsize = 12
+  warning('hardcoding width and height values here because am lazy')
+  browser()
+  rendered <- svglite::xmlSVG(width = width, height = height, pointsize = pointsize, standalone = F, {
+    set_svg_plot()
+    for (j in seq_len(length(sfc_object))){
+      plot(sfc_object[j], ..., xlim = xlim, ylim = ylim, add = ifelse(j == 1, F, T))#instead of sf::plot_sf?
+    }
+  })
+  
+  svg.g <- xml2::xml_child(rendered)
+  if (xml2::xml_length(svg.g) == length(sfc_object) + 1){
+    xml_remove(xml_child(svg.g)) # remove the <rect thing it puts in there>
+  } else if (xml2::xml_length(svg.g) != length(sfc_object)){
+    message('something might be wrong. Length of svg elements is different than number of features',
+            'but ignore this warning for lines.')
+    xml_remove(xml2::xml_child(svg.g))
+  }
+  
+  return(svg.g) # removing the <rect/> element...
+}
+
+process.as_svg_path <- function(viz){
+  svg_path <- as_svg_elements('path', viz)
+  
+  browser()
+  d = sfc_to_d(svg_path$elements$geometry, xlim = svg_path$xlim, ylim = svg_path$ylim)
+  data %>% 
+    mutate(.value = 'path') %>% 
+    mutate(d = sfc_to_d(geometry)) %>% 
+    select(-geometry)
+  
+}
+
+process.as_svg_use <- function(viz){
+  
+  
+  as_svg_elements('use', viz)
+  
+  cbind(data_out, data)
+}
+
+plot_bounds <- function(sfc_object){
+  if (is.null(sfc_object)){
+    NULL
+  } else {
+    bounds <- sf::st_bbox(sfc_object)
+    list(xlim = bounds[c('xmin','xmax')], ylim = bounds[c('ymin','ymax')])
+  }
+  
+}
+as_svg_elements <- function(element_name, viz){
+  deps <- readDepends(viz)
+  box <- deps[['clip_box']]
+  elements <- clip_sf(deps[['data']], box) %>% 
+    mutate(.value = element_name) %>% 
+    select(.value, everything())
+  
+  append(list(elements = elements), plot_bounds(box))
+}
+
+clip_sf <- function(sf_object, sf_clip = NULL){
+  if (!is.null(sf_clip)){
+    st_intersection(st_buffer(sf_object, 0), sf_clip)
+  } else {
+    sf_object
+  }
+}
+
+#' set up the basic plot par for a map
+set_svg_plot <- function(){
+  par(mai=c(0,0,0,0), omi=c(0,0,0,0), xaxs = 'i', yaxs = 'i')
+}
