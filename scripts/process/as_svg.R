@@ -82,6 +82,9 @@ sfc_to_d <- function(sfc_object, xlim, ylim, ...){
     }
   })
   
+  # hmmm...with sf, each polygon of a multi-poly plots as a separate `d`. 
+  # Can get this w/ st_cast(sfc_object[j], "POLYGON")
+  # test for this `"sfc_MULTIPOLYGON" %in% class(sfc_object[j])`
   svg.g <- xml2::xml_child(rendered)
   if (xml2::xml_length(svg.g) == length(sfc_object) + 1){
     xml_remove(xml_child(svg.g)) # remove the <rect thing it puts in there>
