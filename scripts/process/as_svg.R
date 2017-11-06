@@ -77,20 +77,15 @@ sfc_to_d <- function(sfc_object, xlim, ylim, ...){
   
   # hmmm...with sf, each polygon of a multi-poly plots as a separate `d`. 
   # Can get this w/ st_cast(sfc_object[j], "POLYGON")
-  # test for this `"sfc_MULTIPOLYGON" %in% class(sfc_object[j])`
-  # use `feature_id` to track which feature it came from
+  # could test for this `"sfc_MULTIPOLYGON" %in% class(sfc_object[j])`
+  # use `feature_id` to track which feature each polygon came from
   feature_ids <- c()
   rendered <- svglite::xmlSVG(width = width, height = height, pointsize = pointsize, standalone = F, {
     
     set_svg_plot(xlim, ylim)
     for (j in seq_len(length(sfc_object))){
-      if ("sfc_MULTIPOLYGON" %in% class(sfc_object[j])){
-        for (poly in sf::st_cast(sfc_object[j], "POLYGON")){
-          plot(poly, ..., add = TRUE)
-          feature_ids <- c(feature_ids, j)
-        }
-      } else {
-        plot(sfc_object[j], ..., add = TRUE)
+      for (poly in sf::st_cast(sfc_object[j], "POLYGON")){
+        plot(poly, ..., add = TRUE)
         feature_ids <- c(feature_ids, j)
       }
     }
@@ -101,21 +96,27 @@ sfc_to_d <- function(sfc_object, xlim, ylim, ...){
     message('something might be wrong. Length of svg elements is different than number of features',
             'but ignore this warning for lines.')
   }
+  
   # collapse the multi-d into a single one: 
   data_out <- data.frame(d_raw = xml2::xml_attr(xml2::xml_children(svg.g), 'd'), 
                          feature_id = feature_ids, 
                          stringsAsFactors = FALSE) %>% 
     group_by(feature_id) %>% 
-    summarize(d = paste(d_raw, collapse = ' ')) %>% select(d)
+    summarize(d = paste(d_raw, collapse = ' ')) %>% .$d
   
   return(data_out) 
 }
 
 process.as_svg_path <- function(viz){
-  svg_path <- as_svg_elements('path', viz)
+  svg <- as_svg_elements('path', viz)
+  xlim <- svg$xlim
+  ylim <- svg$ylim
   
-  sfc_to_d(svg_path$elements$geometry, xlim = svg_path$xlim, ylim = svg_path$ylim) %>% 
-    mutate(.value = 'path')
+  svg$elements %>% 
+    mutate(d = sfc_to_d(geometry, xlim = xlim, ylim = ylim)) %>% 
+    mutate(.value = 'path') %>% 
+    data.frame() %>% 
+    select(-geometry)
   
 }
 
