@@ -73,48 +73,58 @@ sfc_to_d <- function(sfc_object, xlim, ylim, ...){
   width = 8
   height = 5
   pointsize = 12
-  warning('hardcoding width and height values here because am lazy')
-  browser()
-  rendered <- svglite::xmlSVG(width = width, height = height, pointsize = pointsize, standalone = F, {
-    set_svg_plot()
-    for (j in seq_len(length(sfc_object))){
-      plot(sfc_object[j], ..., xlim = xlim, ylim = ylim, add = ifelse(j == 1, F, T))#instead of sf::plot_sf?
-    }
-  })
+  warning('hardcoding width and height values here because am lazy - TODO***')
   
   # hmmm...with sf, each polygon of a multi-poly plots as a separate `d`. 
   # Can get this w/ st_cast(sfc_object[j], "POLYGON")
   # test for this `"sfc_MULTIPOLYGON" %in% class(sfc_object[j])`
+  # use `feature_id` to track which feature it came from
+  feature_ids <- c()
+  rendered <- svglite::xmlSVG(width = width, height = height, pointsize = pointsize, standalone = F, {
+    
+    set_svg_plot(xlim, ylim)
+    for (j in seq_len(length(sfc_object))){
+      if ("sfc_MULTIPOLYGON" %in% class(sfc_object[j])){
+        for (poly in sf::st_cast(sfc_object[j], "POLYGON")){
+          plot(poly, ..., add = TRUE)
+          feature_ids <- c(feature_ids, j)
+        }
+      } else {
+        plot(sfc_object[j], ..., add = TRUE)
+        feature_ids <- c(feature_ids, j)
+      }
+    }
+  })
+  
   svg.g <- xml2::xml_child(rendered)
-  if (xml2::xml_length(svg.g) == length(sfc_object) + 1){
-    xml_remove(xml_child(svg.g)) # remove the <rect thing it puts in there>
-  } else if (xml2::xml_length(svg.g) != length(sfc_object)){
+  if (tail(feature_ids, 1) != length(sfc_object)){
     message('something might be wrong. Length of svg elements is different than number of features',
             'but ignore this warning for lines.')
-    xml_remove(xml2::xml_child(svg.g))
   }
+  # collapse the multi-d into a single one: 
+  data_out <- data.frame(d_raw = xml2::xml_attr(xml2::xml_children(svg.g), 'd'), 
+                         feature_id = feature_ids, 
+                         stringsAsFactors = FALSE) %>% 
+    group_by(feature_id) %>% 
+    summarize(d = paste(d_raw, collapse = ' ')) %>% select(d)
   
-  return(svg.g) # removing the <rect/> element...
+  return(data_out) 
 }
 
 process.as_svg_path <- function(viz){
   svg_path <- as_svg_elements('path', viz)
   
-  browser()
-  d = sfc_to_d(svg_path$elements$geometry, xlim = svg_path$xlim, ylim = svg_path$ylim)
-  data %>% 
-    mutate(.value = 'path') %>% 
-    mutate(d = sfc_to_d(geometry)) %>% 
-    select(-geometry)
+  sfc_to_d(svg_path$elements$geometry, xlim = svg_path$xlim, ylim = svg_path$ylim) %>% 
+    mutate(.value = 'path')
   
 }
 
 process.as_svg_use <- function(viz){
   
+  stop("not implemented")
+  #as_svg_elements('use', viz)
   
-  as_svg_elements('use', viz)
-  
-  cbind(data_out, data)
+  #cbind(data_out, data)
 }
 
 plot_bounds <- function(sfc_object){
@@ -145,6 +155,7 @@ clip_sf <- function(sf_object, sf_clip = NULL){
 }
 
 #' set up the basic plot par for a map
-set_svg_plot <- function(){
+set_svg_plot <- function(xlim, ylim){
   par(mai=c(0,0,0,0), omi=c(0,0,0,0), xaxs = 'i', yaxs = 'i')
+  plot(NA, 0, xlim = xlim, ylim = ylim, axes = FALSE, frame.plot = FALSE, ann = FALSE)
 }
