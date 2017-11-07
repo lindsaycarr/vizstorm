@@ -23,6 +23,7 @@ process.cells_from_mask <- function(viz){
   cell_grid_clipped <- sf::st_intersection(cell_grid, clip_mask)
   
   # add an id to be used for adding data later:
-  cell_grid_clipped <- st_sf(cell_grid_clipped, row.names = paste('cell_', 1:length(cell_grid_clipped), sep= ''))
+  row_names <- paste('cell_', seq_len(length(cell_grid_clipped)), sep= '')
+  cell_grid_clipped <- st_sf(geometry = cell_grid_clipped, row.names = row_names)
   saveRDS(cell_grid_clipped, file = viz[['location']])
 }

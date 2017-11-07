@@ -137,6 +137,7 @@ process:
       class: 'precip-cell'
     depends: 
       data: "precip_cells"
+      clip_box: "viewbox_limits"
     scripts: [scripts/process/as_svg.R]
   - 
     id: state_polygons_svg
@@ -147,7 +148,7 @@ process:
       id: '{{ID}}-geom' 
     depends: 
       data: "state_map_data"
-      clip_box: viewbox_limits
+      clip_box: "viewbox_limits"
     scripts: [scripts/process/as_svg.R]
   - 
     id: pr_polygons_svg
@@ -158,6 +159,7 @@ process:
       class: island
     depends: 
       data: "puerto_rico_map_data"
+      clip_box: "viewbox_limits"
     scripts: [scripts/process/as_svg.R]
   - 
     id: state_style_svg
