@@ -1,8 +1,12 @@
 
 
-svg_sub_attributes <- function(dataframe, attributes){
+svg_sub_attributes <- function(dataframe, attributes = NULL){
   
-  attributes <- viz[['attributes']]
+  sub_attribute_text <- function(template, data){
+    sapply(seq_len(nrow(data)), FUN = function(j) {
+      whisker::whisker.render(template, data = data[j,])
+    }, USE.NAMES = FALSE)
+  }
   if (!is.null(attributes)){
     # replace existing attributes w/ these user-specified ones
     # evaluate "mustache" keys w/ geom_df
@@ -10,19 +14,18 @@ svg_sub_attributes <- function(dataframe, attributes){
     
     # if mustache keys exist, evaluate with the context of the geom_dataframe variables:
     attrs_subbed <- sapply(attr_names, FUN = function(x) {
-      sub_attribute_text(template = attributes[[x]], data = svg$elements)
+      sub_attribute_text(template = attributes[[x]], data = dataframe)
     })
     
-    svg$elements[attr_names] <- attrs_subbed
+    dataframe[attr_names] <- attrs_subbed
   }
   
-  template, data
-  sapply(seq_len(nrow(data)), FUN = function(j) {
-    whisker::whisker.render(template, data = data[j,])
-    }, USE.NAMES = FALSE)
+  return(dataframe)
 }
 
 sfc_to_d <- function(sfc_object, xlim, ylim, ...){
+  
+  stopifnot(!is.null(sfc_object))
   stopifnot(packageVersion('svglite') == '1.2.0.9003')
   # do the svg thing here:
   width = 8
@@ -72,21 +75,21 @@ process.as_svg_path <- function(viz){
   
   svg_path_out <- svg$elements %>% 
     mutate(d = sfc_to_d(geometry, xlim = xlim, ylim = ylim), .value = 'path') %>% 
-    data.frame() %>% select(-geometry)
+    svg_sub_attributes(attributes = attributes) %>% 
+    data.frame() %>% 
+    select_(.dots = c('.value', names(attributes)))
   
-  warning('now need to update the attributes if they exist')
   saveRDS(svg_path_out, viz[['location']])
 }
 
 process.as_svg_use <- function(viz){
   
-  warning("not fully implemented")
   attributes <- viz[['attributes']]
   
-  svg_elements <- as_svg_elements('use', viz)$elements %>% 
+  svg_use_out <- as_svg_elements('use', viz)$elements %>% 
     svg_sub_attributes(attributes = attributes) %>% 
     data.frame() %>% 
-    select_(.dots = c(names(attributes), '.value'))
+    select_(.dots = c('.value', names(attributes)))
   
   saveRDS(svg_use_out, file = viz[['location']])
 }
@@ -112,7 +115,7 @@ clip_sf <- function(sf_object, sf_clip = NULL){
 as_svg_elements <- function(element_name, viz){
   deps <- readDepends(viz)
   box <- deps[['clip_box']]
-  checkRequired(deps[['data']], 'geometry')
+  
   elements <- clip_sf(deps[['data']], box) %>% 
     mutate(.value = element_name) %>% 
     select(.value, everything())
