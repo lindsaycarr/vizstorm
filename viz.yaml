@@ -189,7 +189,7 @@ process:
   -
     id: svg_defs
     location: cache/svg_defs.rds
-    visualizer: as_svg_defs
+    processor: as_svg_defs
     reader: rds
     depends: 
       states-geoms: state_polygons_svg
@@ -197,7 +197,7 @@ process:
   -
     id: svg_map_style
     location: cache/svg_map_style.rds
-    visualizer: as_svg_g
+    processor: as_svg_g
     reader: rds
     depends: 
       pr-style: pr_polygons_svg
@@ -207,7 +207,7 @@ process:
   -
     id: svg_map_mouse
     location: cache/svg_map_mouse.rds
-    visualizer: as_svg_g
+    processor: as_svg_g
     reader: rds
     depends: 
       states-mouse: state_mouse_svg

@@ -174,6 +174,8 @@ as_svg_elements <- function(element_name, viz){
 #' takes output from one or many process.as_svg_{element} calls 
 #' and creates a `defs` svg container for it
 #' 
+#' @return writes an .rds file that contains the xml from `<g>` in a list
+#' format that can be converted to xml with xml2::as_xml_document()
 #' @details 
 #' if `depends` is empty, this still creates an element, it just 
 #' doesn't have xml children
@@ -195,11 +197,12 @@ process.as_svg_defs <- function(viz){
 
 #' create an xml/svg "group" or `<g>` element for each named dependency
 #' 
-#' @details uses the id, so that pattern matters. 
+#' @return writes an .rds file that contains the xml from `<g>` in a list
+#' format that can be converted to xml with xml2::as_xml_document()
+#' @details doesn't not name the id in the returned group 
 process.as_svg_g <- function(viz){
   deps <- readDepends(viz)
-  g_name <- gsub(pattern = '_', "-", viz[['id']]) %>% gsub(pattern = 'svg-', replacement = '')
-  g_main <- xml_new_root(.value = 'defs', g = g_name)
+  g_main <- xml_new_root(.value = 'defs')
   
   for (g_name in names(deps)){
     g <- xml_add_child(g_main, 'g')
