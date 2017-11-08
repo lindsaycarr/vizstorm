@@ -182,16 +182,16 @@ as_svg_elements <- function(element_name, viz){
 #' named `depends` are converted into `g` (group) names within `defs`
 process.as_svg_defs <- function(viz){
   deps <- readDepends(viz)
-  defs <- xml_new_root(.value = 'defs')
+  defs <- xml_new_root('.x') 
+  group <- xml_add_child(defs, 'defs')
   
   for (g_name in names(deps)){
-    g <- xml_add_child(defs, 'g')
+    g <- xml_add_child(group, 'g')
     svg_data <- deps[[g_name]]
-    for (j in 1:nrow(svg_data)){
+    for (j in seq_len(nrow(svg_data))){
       do.call(xml_add_child, append(list(.x = g), svg_data[j, ]))
     }
   }
-  
   saveRDS(xml2::as_list(defs), file = viz[['location']])
 }
 
@@ -202,10 +202,11 @@ process.as_svg_defs <- function(viz){
 #' @details doesn't not name the id in the returned group 
 process.as_svg_g <- function(viz){
   deps <- readDepends(viz)
-  g_main <- xml_new_root(.value = 'defs')
+  g_main <- xml_new_root('.x') 
+  group <- do.call(xml_add_child, append(list(.x = g_main, .value = 'g'), viz[['attributes']]))
   
   for (g_name in names(deps)){
-    g <- xml_add_child(g_main, 'g')
+    g <- xml_add_child(group, 'g', id = g_name)
     svg_data <- deps[[g_name]]
     for (j in 1:nrow(svg_data)){
       do.call(xml_add_child, append(list(.x = g), svg_data[j, ]))

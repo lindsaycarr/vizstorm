@@ -203,6 +203,8 @@ process:
       pr-style: pr_polygons_svg
       states-style: state_style_svg
       precip-cells: precip_polygons_svg
+    attributes: 
+      id: map-style
     scripts: [scripts/process/as_svg.R] 
   -
     id: svg_map_mouse
@@ -211,16 +213,15 @@ process:
     reader: rds
     depends: 
       states-mouse: state_mouse_svg
+    attributes: 
+      id: map-mouse
     scripts: [scripts/process/as_svg.R] 
 visualize:
   -
     id: svg_skeleton
     location: cache/svg_skeleton.svg
     visualizer: svg_skeleton
-    depends: 
-      map-style: svg_map_style
-      map-mouse: svg_map_mouse
-      defs: svg_defs
+    depends: [svg_map_style, svg_map_mouse, svg_defs]
     scripts: ["scripts/visualize/svg_skeleton.R"]
     reader: svg
     mimetype: image/svg+xml
