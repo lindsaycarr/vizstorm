@@ -67,9 +67,6 @@ bbox_to_polygon <- function(bbox, bbox_crs = "+init=epsg:4326", return_crs = NUL
 #' 
 #' @param geo an sf:: sfc object
 #' @param ... additional arguments passed to svglite::svgstring, e.g., width, height
-#' @param width the width (in inches) of the svg view
-#' @param height the height (in inches) of the svg view
-#' @param pointsize number of pixels per inch
 #' 
 #' @return an sfc polygon of the viewbox limits
 
@@ -82,9 +79,10 @@ plot_viewbox_limits <- function(geo, ...){
     stop("only tested with sfc objects.")
   }
   usr <- par('usr')
+  svg_viewbox <- xml_attr(xml2::read_xml(.fun()[1]), 'viewBox')
   dev.off()
   
   viewbox <- bbox_to_polygon(usr[c(1, 3, 2, 4)], bbox_crs = sf::st_crs(geo))
-  
+  attr(viewbox, 'svg_viewbox') <- svg_viewbox
   return(viewbox)
 }
