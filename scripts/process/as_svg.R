@@ -54,11 +54,10 @@ svg_sub_attributes <- function(dataframe, attributes = NULL){
 #' @param xlim min and max x values in the plotting range in the coordinates of `sfc_object`
 #' @param ylim min and max y values in the plotting range in the coordinates of `sfc_object`
 #' @param \dots additional arguments sent to `plot`
-sfc_to_d <- function(sfc_object, xlim, ylim, ..., width = 8, height = 5, pointsize = 12){
+sfc_to_d <- function(sfc_object, xlim, ylim, ..., width, height, pointsize = 12){
   
   stopifnot(!is.null(sfc_object))
   stopifnot(packageVersion('svglite') == '1.2.0.9003')
-  warning('***TODO*** add way to pass in plot metadata values')
   
   # hmmm...with sf, each polygon of a multi-poly plots as a separate `d`. 
   # Can get this w/ st_cast(sfc_object[j], "POLYGON")
@@ -117,11 +116,10 @@ process.as_svg_path <- function(viz){
   
   attributes <- viz[['attributes']]
   svg <- as_svg_elements('path', viz)
-  xlim <- svg$xlim
-  ylim <- svg$ylim
   
   svg_path_out <- svg[['elements']] %>% 
-    mutate(d = sfc_to_d(geometry, xlim = xlim, ylim = ylim), .value = 'path') %>% 
+    mutate(d = sfc_to_d(geometry, xlim = svg$xlim, ylim = svg$ylim, width = svg$width, height = svg$height), 
+           .value = 'path') %>% 
     svg_sub_attributes(attributes = attributes) %>% 
     data.frame() %>% 
     select_(.dots = c('.value', 'd', names(attributes)))
@@ -186,7 +184,7 @@ process.as_svg_defs <- function(viz){
   group <- xml_add_child(defs, 'defs')
   
   for (g_name in names(deps)){
-    g <- xml_add_child(group, 'g')
+    g <- xml_add_child(group, 'g', id = g_name)
     svg_data <- deps[[g_name]]
     for (j in seq_len(nrow(svg_data))){
       do.call(xml_add_child, append(list(.x = g), svg_data[j, ]))
@@ -229,10 +227,18 @@ plot_bounds <- function(sfc_object){
   if (is.null(sfc_object)){
     NULL
   } else {
+    ppi <- 72
     bounds <- sf::st_bbox(sfc_object)
-    list(xlim = bounds[c('xmin','xmax')], ylim = bounds[c('ymin','ymax')])
+    svg_viewbox <- attr(sfc_object, 'svg_viewbox')
+    margins <- strsplit(svg_viewbox, '[ ]')[[1]] %>% as.numeric()
+    if (margins[1] != 0 | margins[2] != 0){
+      stop(call. = FALSE, 'the svg viewBox attribute must have xmin and ymin of zero')
+    }
+    list(xlim = bounds[c('xmin','xmax')], 
+         ylim = bounds[c('ymin','ymax')],
+         width = margins[3]/ppi,
+         height = margins[4]/ppi)
   }
-  
 }
 
 #' perform an `st_intersection` clip operation on sf object

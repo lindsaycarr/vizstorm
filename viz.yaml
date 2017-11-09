@@ -172,6 +172,7 @@ process:
       id: '{{ID}}'
     depends: 
       data: "state_map_data"
+      clip_box: "viewbox_limits"
     scripts: [scripts/process/as_svg.R]  
   - 
     id: state_mouse_svg
@@ -185,6 +186,7 @@ process:
       href: '#{{ID}}-geom'
     depends: 
       data: "state_map_data"
+      clip_box: "viewbox_limits"
     scripts: [scripts/process/as_svg.R] 
   -
     id: svg_defs
