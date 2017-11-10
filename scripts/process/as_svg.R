@@ -98,6 +98,14 @@ sf_to_path <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
   return(data_out) 
 }
 
+sf_to_text <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
+  stop('not implemented')
+}
+
+sf_to_circle <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
+  stop('not implemented')
+}
+
 #' turn spatial data into svg elements w/ attributes
 #' 
 #' @param viz a viz object, containing both `data` and `clip_box` as depends
