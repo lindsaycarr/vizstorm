@@ -50,14 +50,24 @@ svg_sub_attributes <- function(dataframe, attributes = NULL){
 
 #' convert a simple feature collection into an svg path element's `d` attribute
 #' 
-#' @param sfc_object a simple feature collection, currently limited to polygons
+#' @param .object a simple feature collection, currently limited to polygons
 #' @param xlim min and max x values in the plotting range in the coordinates of `sfc_object`
 #' @param ylim min and max y values in the plotting range in the coordinates of `sfc_object`
 #' @param \dots additional arguments sent to `plot`
-sfc_to_d <- function(sfc_object, xlim, ylim, ..., width, height, pointsize = 12){
+#' @param width the width of the output figure in inches
+#' @param height the height of the output figure in inches
+#' @param pointsize used in svgstring...fonts?
+#' 
+#' @return a data.frame with the same data as `.object`, 
+#' but with the new attribute(s) added, and the geometry removed
+sf_to_path <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
   
-  stopifnot(!is.null(sfc_object))
+  stopifnot(!is.null(.object))
   stopifnot(packageVersion('svglite') == '1.2.0.9003')
+  
+  sfc_object <- .object[["geometry"]]
+  data_in <- data.frame(.object) %>% select(-geometry)
+  data_in$feature_id <- seq_len(nrow(data_in))
   
   # hmmm...with sf, each polygon of a multi-poly plots as a separate `d`. 
   # Can get this w/ st_cast(sfc_object[j], "POLYGON")
@@ -76,19 +86,15 @@ sfc_to_d <- function(sfc_object, xlim, ylim, ..., width, height, pointsize = 12)
   })
   
   
-  svg.g <- xml2::xml_child(rendered)
-  if (tail(feature_ids, 1) != length(sfc_object)){
-    message('something might be wrong. Length of svg elements is different than number of features',
-            'but ignore this warning for lines.')
-  }
-  
+  paths <- xml_child(rendered) %>% xml_children
+
   # collapse the multi-d into a single one: 
-  data_out <- data.frame(d_raw = xml2::xml_attr(xml2::xml_children(svg.g), 'd'), 
+  data_out <- data.frame(d_raw = xml_attr(paths, 'd'), 
                          feature_id = feature_ids, 
                          stringsAsFactors = FALSE) %>% 
     group_by(feature_id) %>% 
-    summarize(d = paste(d_raw, collapse = ' ')) %>% .$d
-  
+    summarize(d = paste(d_raw, collapse = ' ')) %>% 
+    left_join(data_in) %>% select(-feature_id)
   return(data_out) 
 }
 
@@ -118,12 +124,12 @@ process.as_svg_path <- function(viz){
   svg <- as_svg_elements('path', viz)
   
   svg_path_out <- svg[['elements']] %>% 
-    mutate(d = sfc_to_d(geometry, xlim = svg$xlim, ylim = svg$ylim, width = svg$width, height = svg$height), 
-           .value = 'path') %>% 
     svg_sub_attributes(attributes = attributes) %>% 
-    data.frame() %>% 
-    select_(.dots = c('.value', 'd', names(attributes)))
-
+    select_(.dots = names(attributes)) %>% 
+    do(sf_to_path(., xlim = svg$xlim, ylim = svg$ylim, width = svg$width, height = svg$height)) %>% 
+    mutate(.value = 'path') %>% select(.value, everything())
+    
+  
   saveRDS(svg_path_out, viz[['location']])
 }
 
