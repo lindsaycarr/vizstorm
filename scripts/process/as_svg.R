@@ -97,6 +97,8 @@ sf_to_path <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
   return(data_out) 
 }
 
+#' This function would let us take a point collection w/ text data and 
+#' allow us to (for example) place state names on the map programmatically
 sf_to_text <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
   stop('not implemented')
 }
@@ -257,7 +259,7 @@ plot_bounds <- function(sfc_object){
 
 clip_sf <- function(sf_object, sf_clip = NULL){
   if (!is.null(sf_clip)){
-    st_intersection(st_buffer(sf_object, 0), sf_clip)
+    sf::st_intersection(sf::st_buffer(sf_object, 0), sf_clip)
   } else {
     sf_object
   }

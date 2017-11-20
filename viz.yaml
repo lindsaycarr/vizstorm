@@ -83,7 +83,7 @@ fetch:
     id: precip_cell_data
     location: cache/precip_cell_data.rds
     reader: rds
-    fetcher: noaa_precip_gdp
+    fetcher: stageiv_precip_gdp
     scripts: scripts/fetch/precip_cell_data.R
     depends: 
       sf_stencil: precip_cells
