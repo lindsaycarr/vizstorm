@@ -85,11 +85,10 @@ sf_to_path <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
     }
   })
   
-  
-  paths <- xml_child(rendered) %>% xml_children
+  paths <- xml2::xml_child(rendered) %>% xml2::xml_children()
 
   # collapse the multi-d into a single one: 
-  data_out <- data.frame(d_raw = xml_attr(paths, 'd'), 
+  data_out <- data.frame(d_raw = xml2::xml_attr(paths, 'd'), 
                          feature_id = feature_ids, 
                          stringsAsFactors = FALSE) %>% 
     group_by(feature_id) %>% 
@@ -177,8 +176,7 @@ as_svg_elements <- function(element_name, viz){
   box <- deps[['clip_box']]
   
   elements <- clip_sf(deps[['data']], box) %>% 
-    mutate(.value = element_name) %>% 
-    select(.value, everything())
+    mutate(.value = element_name) 
   
   append(list(elements = elements), plot_bounds(box))
 }
@@ -194,14 +192,14 @@ as_svg_elements <- function(element_name, viz){
 #' named `depends` are converted into `g` (group) names within `defs`
 process.as_svg_defs <- function(viz){
   deps <- readDepends(viz)
-  defs <- xml_new_root('.x') 
-  group <- xml_add_child(defs, 'defs')
+  defs <- xml2::xml_new_root('.x') 
+  group <- xml2::xml_add_child(defs, 'defs')
   
   for (g_name in names(deps)){
-    g <- xml_add_child(group, 'g', id = g_name)
+    g <- xml2::xml_add_child(group, 'g', id = g_name)
     svg_data <- deps[[g_name]]
     for (j in seq_len(nrow(svg_data))){
-      do.call(xml_add_child, append(list(.x = g), svg_data[j, ]))
+      do.call(xml2::xml_add_child, append(list(.x = g), svg_data[j, ]))
     }
   }
   saveRDS(xml2::as_list(defs), file = viz[['location']])
@@ -211,24 +209,24 @@ process.as_svg_defs <- function(viz){
 #' 
 #' @return writes an .rds file that contains the xml from `<g>` in a list
 #' format that can be converted to xml with xml2::as_xml_document()
-#' @details doesn't not name the id in the returned group 
+#' @details doesn't name the id in the returned group 
 process.as_svg_g <- function(viz){
   deps <- readDepends(viz)
-  g_main <- xml_new_root('.x') 
-  group <- do.call(xml_add_child, append(list(.x = g_main, .value = 'g'), viz[['attributes']]))
+  g_main <- xml2::xml_new_root('.x') 
+  group <- do.call(xml2::xml_add_child, append(list(.x = g_main, .value = 'g'), viz[['attributes']]))
   
   for (g_name in names(deps)){
-    g <- xml_add_child(group, 'g', id = g_name)
+    g <- xml2::xml_add_child(group, 'g', id = g_name)
     svg_data <- deps[[g_name]]
     for (j in 1:nrow(svg_data)){
-      do.call(xml_add_child, append(list(.x = g), svg_data[j, ]))
+      do.call(xml2::xml_add_child, append(list(.x = g), svg_data[j, ]))
     }
   }
 
   saveRDS(xml2::as_list(g_main), file = viz[['location']])
 }
 
-#' set up the basic plot par for a map
+#' set up the basic plot par and empty plot
 set_svg_plot <- function(xlim, ylim){
   par(mai=c(0,0,0,0), omi=c(0,0,0,0), xaxs = 'i', yaxs = 'i')
   plot(NA, 0, xlim = xlim, ylim = ylim, axes = FALSE, frame.plot = FALSE, ann = FALSE)

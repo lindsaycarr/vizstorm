@@ -32,8 +32,10 @@ info:
       repo: CRAN
       version: 0.5-4
     svglite:
-      repo: CRAN 
-      version: 1.2.0
+      repo: github 
+      version: 1.2.0.9003
+      name: jread-usgs/svglite
+      ref: svgnano
     sp:
       repo: CRAN
       version: 1.2.5
