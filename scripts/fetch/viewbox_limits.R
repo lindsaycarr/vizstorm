@@ -27,7 +27,7 @@ fetch.viewbox_limits <- function(viz = as.viz('viewbox_limits')){
   bbox_polygon <- bbox_to_polygon(spatial_meta$bbox, 
                             return_crs = spatial_meta$crs)
   
-  # if `plot_metadata` isn't used, defaults from plot_viewbox_limits are used: 
+  # if `plot_metadata` isn't used, defaults from svglite::svgstring() are used: 
   viewbox_args <- append(list(geo = bbox_polygon), deps[["plot_metadata"]])
   viewbox_limits <- do.call(plot_viewbox_limits, args = viewbox_args)
                                 

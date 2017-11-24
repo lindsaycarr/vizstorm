@@ -1,6 +1,6 @@
 
 
-fetch.noaa_precip_gdp <- function(viz){
+fetch.stageiv_precip_gdp <- function(viz){
   # NOAA stage IV precip:
   url <- "https://cida.usgs.gov/thredds/dodsC/stageiv_combined"
   variables <- "Total_precipitation_surface_1_Hour_Accumulation"
@@ -26,3 +26,5 @@ fetch.noaa_precip_gdp <- function(viz){
   data <- geoknife::result(job, with.units = TRUE)
   saveRDS(data, file = viz[['location']])
 }
+
+fetchTimestamp.stageiv_precip_gdp <- vizlab::alwaysCurrent
