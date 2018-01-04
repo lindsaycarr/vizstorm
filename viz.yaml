@@ -229,4 +229,23 @@ visualize:
     scripts: ["scripts/visualize/svg_skeleton.R"]
     reader: svg
     mimetype: image/svg+xml
+  -
+    id: test_d3
+    location: visualize/test_d3.js
+    mimetype: application/javascript
+  -
+    id: appJS
+    location: visualize/app.js
+    mimetype: application/javascript
 publish:
+  -
+    id: test_page
+    name: index
+    template: fullpage
+    publisher: page
+    depends: 
+      svg: "svg_skeleton"
+      js: "appJS"
+    context:
+      resources: "js"
+      sections: "svg"
