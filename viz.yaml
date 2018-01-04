@@ -229,4 +229,16 @@ visualize:
     scripts: ["scripts/visualize/svg_skeleton.R"]
     reader: svg
     mimetype: image/svg+xml
+    title: "SVG skeleton"
+    alttext: "Beginning of the full storm SVG"
 publish:
+  -
+    id: vizstorm_page
+    name: index
+    template: fullpage
+    publisher: page
+    depends: 
+      storm_figure: "svg_skeleton"
+    context:
+      resources: 
+      sections: "storm_figure"
