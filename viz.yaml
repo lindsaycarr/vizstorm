@@ -233,10 +233,10 @@ visualize:
     alttext: "Beginning of the full storm SVG"
 publish:
   -
+    id: test_d3
+    location: "js/hydrograph.js"
     mimetype: application/javascript
   -
-    id: test_d3
-    location: "js/test_d3.js"
     mimetype: application/javascript
   -
     id: vizstorm_page
