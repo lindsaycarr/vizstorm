@@ -79,7 +79,7 @@ plot_viewbox_limits <- function(geo, ...){
     stop("only tested with sfc objects.")
   }
   usr <- par('usr')
-  svg_viewbox <- xml_attr(xml2::read_xml(.fun()[1]), 'viewBox')
+  svg_viewbox <- xml2::xml_attr(xml2::read_xml(.fun()[1]), 'viewBox')
   dev.off()
   
   viewbox <- bbox_to_polygon(usr[c(1, 3, 2, 4)], bbox_crs = sf::st_crs(geo))
