@@ -231,23 +231,21 @@ visualize:
     mimetype: image/svg+xml
     title: "SVG skeleton"
     alttext: "Beginning of the full storm SVG"
+publish:
   -
     id: test_d3
-    location: visualize/test_d3.js
+    publisher: js
     mimetype: application/javascript
-  -
-    id: appJS
-    location: visualize/app.js
-    mimetype: application/javascript
-publish:
+    relpath: "js/test_d3.js"
   -
     id: vizstorm_page
     name: index
     template: fullpage
     publisher: page
-    depends:
+    depends: 
+      js: "test_d3"
       storm_figure: "svg_skeleton"
-      js: "appJS"
     context:
-      resources: "js"
-      sections: "storm_figure"
+      resources: ["js"]
+      sections: ["storm_figure"]
+      
