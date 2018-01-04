@@ -234,9 +234,8 @@ visualize:
 publish:
   -
     id: test_d3
-    publisher: js
+    location: "js/test_d3.js"
     mimetype: application/javascript
-    relpath: "js/test_d3.js"
   -
     id: vizstorm_page
     name: index
@@ -246,6 +245,6 @@ publish:
       js: "test_d3"
       storm_figure: "svg_skeleton"
     context:
-      resources: ["js"]
-      sections: ["storm_figure"]
+      resources: 
+      sections: ["storm_figure", "js"]
       
