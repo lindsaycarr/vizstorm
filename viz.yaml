@@ -233,8 +233,6 @@ visualize:
     alttext: "Beginning of the full storm SVG"
 publish:
   -
-    id: d3_library
-    location: "js/d3.v4.min.js"
     mimetype: application/javascript
   -
     id: test_d3
@@ -246,10 +244,10 @@ publish:
     template: fullpage
     publisher: page
     depends: 
-      d3: "d3_library"
+      lib-d3-js: lib-d3-js
       js: "test_d3"
       storm_figure: "svg_skeleton"
     context:
-      resources: ["d3"]
+      resources: ["lib-d3-js"]
       sections: ["storm_figure", "js"]
       
