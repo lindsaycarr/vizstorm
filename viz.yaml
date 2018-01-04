@@ -237,7 +237,6 @@ publish:
     location: "js/hydrograph.js"
     mimetype: application/javascript
   -
-  -
     id: vizstorm_page
     name: index
     template: fullpage
