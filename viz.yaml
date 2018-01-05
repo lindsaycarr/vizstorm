@@ -129,112 +129,44 @@ process:
     scripts: [scripts/process/cells_from_mask.R]
     depends: 
       mask_poly: "state_map_data"
-  - 
-    id: precip_polygons_svg
-    location: cache/precip_polygons_svg.rds
-    reader: rds
-    processor: as_svg_path
-    attributes:
-      id: '{{ID}}' 
-      class: 'precip-cell'
-    depends: 
-      data: "precip_cells"
-      clip_box: "viewbox_limits"
-    scripts: [scripts/process/as_svg.R]
-  - 
-    id: state_polygons_svg
-    location: cache/state_polygons_svg.rds
-    reader: rds
-    processor: as_svg_path
-    attributes:
-      id: '{{ID}}-geom' 
-    depends: 
-      data: "state_map_data"
-      clip_box: "viewbox_limits"
-    scripts: [scripts/process/as_svg.R]
-  - 
-    id: pr_polygons_svg
-    location: cache/pr_polygons_svg.rds
-    reader: rds
-    processor: as_svg_path
-    attributes:
-      class: island
-    depends: 
-      data: "puerto_rico_map_data"
-      clip_box: "viewbox_limits"
-    scripts: [scripts/process/as_svg.R]
-  - 
-    id: state_style_svg
-    location: cache/state_style_dataframe.rds
-    reader: rds
-    processor: as_svg_use
-    attributes:
-      class: state
-      href: '#{{ID}}-geom'
-      id: '{{ID}}'
-    depends: 
-      data: "state_map_data"
-      clip_box: "viewbox_limits"
-    scripts: [scripts/process/as_svg.R]  
-  - 
-    id: state_mouse_svg
-    location: cache/state_mouse_dataframe.rds
-    reader: rds
-    processor: as_svg_use
-    attributes:
-      onmouseover: hovertext('{{ID}}', evt)
-      onmouseout: hovertext(' ')
-      class: mouseover
-      href: '#{{ID}}-geom'
-    depends: 
-      data: "state_map_data"
-      clip_box: "viewbox_limits"
-    scripts: [scripts/process/as_svg.R] 
   -
-    id: svg_defs
-    location: cache/svg_defs.rds
-    processor: as_svg_defs
-    reader: rds
+    id: state_map_geojson
+    location: cache/state_map.geojson
+    reader: json
+    processor: save_map
+    scripts: [scripts/process/save_map.R]
     depends: 
-      states-geoms: state_polygons_svg
-    scripts: [scripts/process/as_svg.R] 
+      map_data: state_map_data
   -
-    id: svg_map_style
-    location: cache/svg_map_style.rds
-    processor: as_svg_g
-    reader: rds
+    id: county_map_geojson
+    location: cache/county_map.geojson
+    reader: json
+    processor: save_map
+    scripts: [scripts/process/save_map.R]
     depends: 
-      pr-style: pr_polygons_svg
-      states-style: state_style_svg
-      precip-cells: precip_polygons_svg
-    attributes: 
-      id: map-style
-    scripts: [scripts/process/as_svg.R] 
+      map_data: county_map_data
   -
-    id: svg_map_mouse
-    location: cache/svg_map_mouse.rds
-    processor: as_svg_g
-    reader: rds
+    id: puerto_rico_map_geojson
+    location: cache/puerto_rico_map.geojson
+    reader: json
+    processor: save_map
+    scripts: [scripts/process/save_map.R]
     depends: 
-      states-mouse: state_mouse_svg
-    attributes: 
-      id: map-mouse
-    scripts: [scripts/process/as_svg.R] 
+      map_data: puerto_rico_map_data
+  -
+    id: islands_map_geojson
+    location: cache/islands_map.geojson
+    reader: json
+    processor: save_map
+    scripts: [scripts/process/save_map.R]
+    depends: 
+      map_data: islands_map_data
 visualize:
-  -
-    id: svg_skeleton
-    location: cache/svg_skeleton.svg
-    visualizer: svg_skeleton
-    depends: [svg_map_style, svg_map_mouse, svg_defs]
-    scripts: ["scripts/visualize/svg_skeleton.R"]
-    reader: svg
-    mimetype: image/svg+xml
-    title: "SVG skeleton"
-    alttext: "Beginning of the full storm SVG"
+
 publish:
   -
-    id: test_d3
-    location: "js/hydrograph.js"
+    id: map_js
+    location: "js/map.js"
     mimetype: application/javascript
   -
     id: vizstorm_page
@@ -243,9 +175,8 @@ publish:
     publisher: page
     depends: 
       lib-d3-js: lib-d3-js
-      js: "test_d3"
-      storm_figure: "svg_skeleton"
+      map_js: "map_js"
     context:
       resources: ["lib-d3-js"]
-      sections: ["storm_figure", "js"]
+      sections: ["map_js"]
       
