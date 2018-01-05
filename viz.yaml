@@ -137,6 +137,8 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: state_map_data
+    export: true
+    mimetype: application/javascript
   -
     id: county_map_geojson
     location: cache/county_map.geojson
@@ -164,6 +166,11 @@ process:
 visualize:
 
 publish:
+  -
+    # HACK, but not quite the same as vizlab issue #263 (couldn't get that to work)
+    id: state_map_publish 
+    location: cache/state_map.geojson
+    mimetype: application/javascript
   -
     id: map_js
     location: "js/map.js"

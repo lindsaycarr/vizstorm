@@ -20,7 +20,7 @@ var map = svg.append( 'g' )
     .attr( 'id', 'map' );
 
 // Add map features
-d3.json('../cache/state_map.geojson', function(us_data){
+d3.json('js/state_map.geojson', function(us_data){
 
     map.selectAll( 'path' )
         .data(us_data.features)
