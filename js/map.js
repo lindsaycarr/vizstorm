@@ -34,17 +34,6 @@ function createMap() {
 	// so in this case, all of the results from q.defers
 	var state_data = arguments[1];
 	var county_data = arguments[2];
-
-  // add states
-  map.append("g").attr('id', 'statemap')
-        .selectAll( 'path' )
-        .data(state_data.features)
-        .enter()
-        .append('path')
-        .attr('d', path)
-        .attr('fill', "white")
-        .attr('stroke', 'black')
-        .attr('stroke-width', 0.5);
         
   // add counties
   map.append("g").attr('id', 'countymap')
@@ -58,6 +47,18 @@ function createMap() {
         .attr('stroke-width', 0.25)
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
+    
+  // add states on top of counties
+  map.append("g").attr('id', 'statemap')
+        .selectAll( 'path' )
+        .data(state_data.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr("pointer-events", "none") // pointer events passed to county layer
+        .attr('fill', "transparent")
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2);
 }
 
 function mouseover(d) {
