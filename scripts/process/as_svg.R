@@ -86,7 +86,7 @@ sf_to_path <- function(.object, xlim, ylim, ..., width, height, pointsize = 12){
   })
   
   paths <- xml2::xml_child(rendered) %>% xml2::xml_children()
-
+  
   # collapse the multi-d into a single one: 
   data_out <- data.frame(d_raw = xml2::xml_attr(paths, 'd'), 
                          feature_id = feature_ids, 
@@ -137,7 +137,7 @@ process.as_svg_path <- function(viz){
     select_(.dots = names(attributes)) %>% 
     do(sf_to_path(., xlim = svg$xlim, ylim = svg$ylim, width = svg$width, height = svg$height)) %>% 
     mutate(.value = 'path') %>% select(.value, everything())
-    
+  
   
   saveRDS(svg_path_out, viz[['location']])
 }
@@ -224,7 +224,7 @@ process.as_svg_g <- function(viz){
       do.call(xml2::xml_add_child, append(list(.x = g), svg_data[j, ]))
     }
   }
-
+  
   saveRDS(xml2::as_list(g_main), file = viz[['location']])
 }
 
