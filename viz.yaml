@@ -131,17 +131,15 @@ process:
       mask_poly: "state_map_data"
   -
     id: state_map_geojson
-    savelocation: cache/state_map.geojson
+    location: cache/state_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: state_map_data
-    export: true
-    mimetype: application/javascript
   -
     id: county_map_geojson
-    savelocation: cache/county_map.geojson
+    location: cache/county_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -149,7 +147,7 @@ process:
       map_data: county_map_data
   -
     id: puerto_rico_map_geojson
-    savelocation: cache/puerto_rico_map.geojson
+    location: cache/puerto_rico_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -157,7 +155,7 @@ process:
       map_data: puerto_rico_map_data
   -
     id: islands_map_geojson
-    savelocation: cache/islands_map.geojson
+    location: cache/islands_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -166,11 +164,6 @@ process:
 visualize:
 
 publish:
-  -
-    # HACK, but not quite the same as vizlab issue #263 (couldn't get that to work)
-    id: state_map_publish 
-    location: cache/state_map.geojson
-    mimetype: application/javascript
   -
     id: map_js
     location: "js/map.js"
