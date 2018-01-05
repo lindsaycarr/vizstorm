@@ -131,7 +131,7 @@ process:
       mask_poly: "state_map_data"
   -
     id: state_map_geojson
-    location: cache/state_map.geojson
+    savelocation: cache/state_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -141,7 +141,7 @@ process:
     mimetype: application/javascript
   -
     id: county_map_geojson
-    location: cache/county_map.geojson
+    savelocation: cache/county_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -149,7 +149,7 @@ process:
       map_data: county_map_data
   -
     id: puerto_rico_map_geojson
-    location: cache/puerto_rico_map.geojson
+    savelocation: cache/puerto_rico_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]
@@ -157,7 +157,7 @@ process:
       map_data: puerto_rico_map_data
   -
     id: islands_map_geojson
-    location: cache/islands_map.geojson
+    savelocation: cache/islands_map.geojson
     reader: json
     processor: save_map
     scripts: [scripts/process/save_map.R]

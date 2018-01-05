@@ -17,10 +17,10 @@ process.save_map <- function(viz){
   # saves empty file if there is not any map features
   if(nrow(map_data) > 0){
     map_data_sp <- as(map_data, "Spatial") 
-    rgdal::writeOGR(map_data_sp, viz[['location']], 
+    rgdal::writeOGR(map_data_sp, viz[['savelocation']], 
                     layer="map_data_sp", driver="GeoJSON")
   } else {
-    write.table(data.frame(), viz[["location"]])
+    write.table(data.frame(), viz[["savelocation"]])
   }
   
 }
