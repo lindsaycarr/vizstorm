@@ -1,5 +1,5 @@
 // Width and height
-var chart_width     =   800;
+var chart_width     =   1000;
 var chart_height    =   600;
 
 // Projection
