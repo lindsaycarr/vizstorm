@@ -23,6 +23,7 @@ var map = svg.append( 'g' )
 d3.queue()
   .defer(d3.json, "../cache/state_map.geojson")
   .defer(d3.json, "../cache/county_map.geojson")
+  .defer(d3.json, "../cache/precip_cells.geojson")
   .await(createMap);
 
 function createMap() {
@@ -34,7 +35,8 @@ function createMap() {
 	// so in this case, all of the results from q.defers
 	var state_data = arguments[1];
 	var county_data = arguments[2];
-        
+	var precip_cells = arguments[3];
+  
   // add states
   map.append("g").attr('id', 'statepolygons')
         .selectAll( 'path' )
@@ -69,6 +71,18 @@ function createMap() {
         .attr('fill', "transparent")
         .attr('stroke', '#5f5f5f')
         .attr('stroke-width', 0.5);
+  
+  // add precip cells on top of everything else
+  map.append("g").attr('id', 'precipcells')
+        .selectAll( 'path' )
+        .data(precip_cells.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr("pointer-events", "none") // pointer events passed to county layer
+        .attr('fill', "transparent")
+        .attr('stroke', 'red')
+        .attr('stroke-width', 2);
 }
 
 function mouseover(d) {
