@@ -19,26 +19,51 @@ var svg = d3.select("body")
 var map = svg.append( 'g' )
     .attr( 'id', 'map' );
 
-// Add map features
-d3.json('../cache/state_map.geojson', function(us_data){
+// Add map features, need to queue to load more than one json
+d3.queue()
+  .defer(d3.json, "../cache/state_map.geojson")
+  .defer(d3.json, "../cache/county_map.geojson")
+  .await(createMap);
 
-    map.selectAll( 'path' )
-        .data(us_data.features)
+function createMap() {
+  
+  // arguments[0] is the error
+	var error = arguments[0];
+	
+	// the rest of the indices of arguments are all the other arguments passed in
+	// so in this case, all of the results from q.defers
+	var state_data = arguments[1];
+	var county_data = arguments[2];
+
+  // add states
+  map.append("g").attr('id', 'statemap')
+        .selectAll( 'path' )
+        .data(state_data.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('fill', "white")
+        .attr('stroke', 'black')
+        .attr('stroke-width', 0.5);
+        
+  // add counties
+  map.append("g").attr('id', 'countymap')
+        .selectAll( 'path' )
+        .data(county_data.features)
         .enter()
         .append('path')
         .attr('d', path)
         .attr('fill', "cornflowerblue")
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 0.5)
+        .attr('stroke', 'white')
+        .attr('stroke-width', 0.25)
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
+}
 
-});
-
-function mouseover(d){
+function mouseover(d) {
   d3.select(this).style('fill', 'orange'); 
 }
 
-function mouseout(d){
+function mouseout(d) {
   d3.select(this).style('fill', "cornflowerblue");
 }
