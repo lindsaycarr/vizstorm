@@ -35,21 +35,31 @@ function createMap() {
 	var state_data = arguments[1];
 	var county_data = arguments[2];
         
+  // add states
+  map.append("g").attr('id', 'statepolygons')
+        .selectAll( 'path' )
+        .data(state_data.features)
+        .enter()
+        .append('path')
+        .attr('d', path)
+        .attr('fill', "#9a9a9a")
+        .attr('stroke', 'none');
+  
   // add counties
-  map.append("g").attr('id', 'countymap')
+  map.append("g").attr('id', 'countypolygons')
         .selectAll( 'path' )
         .data(county_data.features)
         .enter()
         .append('path')
         .attr('d', path)
-        .attr('fill', "cornflowerblue")
-        .attr('stroke', 'white')
-        .attr('stroke-width', 0.25)
+        .attr('fill', "#efefef")
+        .attr('stroke', '#c6c6c6')
+        .attr('stroke-width', 0.5)
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
     
-  // add states on top of counties
-  map.append("g").attr('id', 'statemap')
+  // add state outline on top of counties
+  map.append("g").attr('id', 'stateoutline')
         .selectAll( 'path' )
         .data(state_data.features)
         .enter()
@@ -57,8 +67,8 @@ function createMap() {
         .attr('d', path)
         .attr("pointer-events", "none") // pointer events passed to county layer
         .attr('fill', "transparent")
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2);
+        .attr('stroke', '#5f5f5f')
+        .attr('stroke-width', 0.5);
 }
 
 function mouseover(d) {
@@ -66,5 +76,5 @@ function mouseover(d) {
 }
 
 function mouseout(d) {
-  d3.select(this).style('fill', "cornflowerblue");
+  d3.select(this).style('fill', "#efefef");
 }
