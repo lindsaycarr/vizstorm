@@ -22,7 +22,12 @@ var map = svg.append( 'g' )
 // Define the div for the tooltip
 var div = d3.select("body")
     .append("div")
-    .attr("class", "tooltip");
+    .attr("class", "tooltip")
+		.style("pointer-events", "none")
+		.style("background", "rgba(255,255,255,0.8)") //white, slightly transparent
+		.style("border", "3px")
+		.style("border-radius", "8px")
+		.style("font-family", "sans-serif");
 
 // Add map features, need to queue to load more than one json
 d3.queue()
@@ -92,23 +97,27 @@ function createMap() {
 
 function mouseover(d) {
   var x_val = d3.event.pageX; 
-	var y_val = d3.event.pageY; 
-	console.log(x_val, y_val, )
+	var y_val = d3.event.pageY;
+	var y_buffer = y_val*0.05; // move text above mouse by 5% of yval
+	
 	d3.select(".tooltip")
 		.style("display", "block")
 		.style("position", "absolute")
 		.style("left", x_val+"px")
-		.style("top", y_val+"px")
-		.style("pointer-events", "none")
-		.text(d.properties.ID);
+		.style("top", (y_val-y_buffer)+"px")
+		.style("text-anchor", "end")
+		.style("text-transform", "capitalize")
+		.text(formatCountyName(d.properties.ID));
   
   d3.select(this).style('fill', 'orange'); 
 }
 
 function mouseout(d) {
   d3.selectAll(".tooltip")
-		.style("display", "none")
-		.style("pointer-events", "none");
+		.style("display", "none");
 		
   d3.select(this).style('fill', "#efefef");
 }
+
+function formatCountyName(nm) {
+  return nm.split(",").reverse().join(", ");
