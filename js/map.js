@@ -18,6 +18,11 @@ var svg = d3.select("body")
 
 var map = svg.append( 'g' )
     .attr( 'id', 'map' );
+      
+// Define the div for the tooltip
+var div = d3.select("body")
+    .append("div")
+    .attr("class", "tooltip");
 
 // Add map features, need to queue to load more than one json
 d3.queue()
@@ -86,9 +91,24 @@ function createMap() {
 }
 
 function mouseover(d) {
+  var x_val = d3.event.pageX; 
+	var y_val = d3.event.pageY; 
+	console.log(x_val, y_val, )
+	d3.select(".tooltip")
+		.style("display", "block")
+		.style("position", "absolute")
+		.style("left", x_val+"px")
+		.style("top", y_val+"px")
+		.style("pointer-events", "none")
+		.text(d.properties.ID);
+  
   d3.select(this).style('fill', 'orange'); 
 }
 
 function mouseout(d) {
+  d3.selectAll(".tooltip")
+		.style("display", "none")
+		.style("pointer-events", "none");
+		
   d3.select(this).style('fill', "#efefef");
 }
