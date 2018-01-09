@@ -33,11 +33,9 @@ var div = d3.select("body")
 var precip = d3.map();
 
 // precip color scale
-var color_vals = d3.schemeBlues[9];
-color_vals.unshift("transparent"); //add to front of color array
 var color = d3.scaleThreshold()
     .domain(d3.range(0, 10)) // need better way to get range of data, should do inside queue
-    .range(color_vals);
+    .range(d3.schemeBlues[9]);
 
 // Add map features, need to queue to load more than one json
 d3.queue()
@@ -91,7 +89,7 @@ function createMap() {
         .append('path')
         .attr('d', path)
         .attr("pointer-events", "none") // pointer events passed to county layer
-        .attr('fill', "transparent")
+        .attr('fill', "none")
         .attr('stroke', '#5f5f5f')
         .attr('stroke-width', 0.5);
   
@@ -105,7 +103,11 @@ function createMap() {
         .attr("pointer-events", "none") // pointer events passed to county layer
         .attr('fill', function(d) { 
           d.precip = precip.get(d.properties.ID); //use "get" to grab precip from the match ID
-          return color(d.precip); 
+          if(d.precip > 0) { //need if statement, adding "transparent" to array did not work
+            return color(d.precip); 
+          } else {
+            return "transparent";
+          } 
         })
         .attr('stroke', 'none')
         .attr("opacity", "0.7");
