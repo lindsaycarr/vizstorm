@@ -12,11 +12,16 @@ process.save_map <- function(viz){
   deps <- readDepends(viz)
   checkRequired(deps, "map_data")
   map_data <- deps[["map_data"]]
-
+  
   # spatial data needs to be sp to use writeOGR
   # saves empty file if there is not any map features
   if(nrow(map_data) > 0){
     map_data_sp <- as(map_data, "Spatial") 
+    # precip cells were missing data, causing writeOGR to fail
+    # added the rowname ("cell 1") as an ID, and it works (Hack?)
+    if(any(dim(map_data_sp@data) == 0)){
+      map_data_sp@data <- data.frame(ID = row.names(map_data_sp@data), stringsAsFactors = FALSE)
+    }
     rgdal::writeOGR(map_data_sp, viz[['location']], 
                     layer="map_data_sp", driver="GeoJSON")
   } else {

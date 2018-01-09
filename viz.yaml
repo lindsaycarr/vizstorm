@@ -129,6 +129,14 @@ process:
     scripts: [scripts/process/cells_from_mask.R]
     depends: 
       mask_poly: "state_map_data"
+  - 
+    id: precip_cells_geojson
+    location: cache/precip_cells.geojson
+    reader: json
+    processor: save_map
+    scripts: [scripts/process/save_map.R]
+    depends: 
+      map_data: precip_cells
   -
     id: state_map_geojson
     location: cache/state_map.geojson
