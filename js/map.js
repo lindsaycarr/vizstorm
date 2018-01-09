@@ -28,12 +28,25 @@ var div = d3.select("body")
 		.style("border", "3px")
 		.style("border-radius", "8px")
 		.style("font-family", "sans-serif");
+		
+// setup var to map precip data to cells
+var precip = d3.map();
+
+// precip color scale
+var color_vals = d3.schemeBlues[9];
+color_vals.unshift("transparent"); //add to front of color array
+var color = d3.scaleThreshold()
+    .domain(d3.range(0, 10)) // need better way to get range of data, should do inside queue
+    .range(color_vals);
 
 // Add map features, need to queue to load more than one json
 d3.queue()
   .defer(d3.json, "../cache/state_map.geojson")
   .defer(d3.json, "../cache/county_map.geojson")
   .defer(d3.json, "../cache/precip_cells.geojson")
+  .defer(d3.csv, "../cache/precip_cell_data.csv", function(d) { 
+    precip.set(d.cell, +d.precip); 
+  })
   .await(createMap);
 
 function createMap() {
@@ -90,9 +103,13 @@ function createMap() {
         .append('path')
         .attr('d', path)
         .attr("pointer-events", "none") // pointer events passed to county layer
-        .attr('fill', "transparent")
-        .attr('stroke', 'red')
-        .attr('stroke-width', 2);
+        .attr('fill', function(d) { 
+          d.precip = precip.get(d.properties.ID); //use "get" to grab precip from the match ID
+          return color(d.precip); 
+        })
+        .attr('stroke', 'none')
+        .attr("opacity", "0.7");
+
 }
 
 function mouseover(d) {
@@ -121,3 +138,6 @@ function mouseout(d) {
 
 function formatCountyName(nm) {
   return nm.split(",").reverse().join(", ");
+}
+
+

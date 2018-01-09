@@ -24,7 +24,14 @@ fetch.stageiv_precip_gdp <- function(viz){
   job <- geoknife::geoknife(stencil, fabric, wait = TRUE, REQUIRE_FULL_COVERAGE=FALSE)
   
   data <- geoknife::result(job, with.units = TRUE)
-  saveRDS(data, file = viz[['location']])
+  
+  tidy_data <- tidyr::gather(data, key = "cell", value = "precip", 
+                             -c(DateTime, variable, statistic, units))
+  
+  #force into one timestep for now...animation of multiple will come later
+  tidy_data_t <- dplyr::filter(tidy_data, DateTime == "2014-01-02 12:00:00")
+  
+  write.csv(tidy_data_t, file = viz[['location']], row.names=FALSE)
 }
 
 fetchTimestamp.stageiv_precip_gdp <- vizlab::alwaysCurrent

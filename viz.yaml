@@ -81,8 +81,8 @@ fetch:
     depends: viewbox_limits
   -
     id: precip_cell_data
-    location: cache/precip_cell_data.rds
-    reader: rds
+    location: cache/precip_cell_data.csv
+    reader: csv
     fetcher: stageiv_precip_gdp
     scripts: scripts/fetch/precip_cell_data.R
     depends: 
@@ -124,11 +124,11 @@ process:
     id: precip_cells
     location: cache/precip_cells.rds
     reader: rds
-    cell_size: 80000
+    cell_size: 0.3
     processor: cells_from_mask
     scripts: [scripts/process/cells_from_mask.R]
     depends: 
-      mask_poly: "state_map_data"
+      mask_poly: "county_map_data"
   - 
     id: precip_cells_geojson
     location: cache/precip_cells.geojson
@@ -182,9 +182,10 @@ publish:
     template: fullpage
     publisher: page
     depends: 
-      lib-d3-js: lib-d3-js
+      lib_d3_js: "lib-d3-js"
+      lib_d3_scale_js: "lib-d3-scale-js"
       map_js: "map_js"
     context:
-      resources: ["lib-d3-js"]
+      resources: ["lib_d3_js", "lib_d3_scale_js"]
       sections: ["map_js"]
       
