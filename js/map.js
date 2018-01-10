@@ -64,9 +64,7 @@ function createMap() {
         .data(state_data.features)
         .enter()
         .append('path')
-        .attr('d', path)
-        .attr('fill', "#9a9a9a")
-        .attr('stroke', 'none');
+        .attr('d', path);
   
   // add counties
   map.append("g").attr('id', 'countypolygons')
@@ -75,9 +73,6 @@ function createMap() {
         .enter()
         .append('path')
         .attr('d', path)
-        .attr('fill', "#efefef")
-        .attr('stroke', '#c6c6c6')
-        .attr('stroke-width', 0.5)
         .on("mouseover", mouseover)
         .on("mouseout", mouseout);
     
@@ -87,11 +82,7 @@ function createMap() {
         .data(state_data.features)
         .enter()
         .append('path')
-        .attr('d', path)
-        .attr("pointer-events", "none") // pointer events passed to county layer
-        .attr('fill', "none")
-        .attr('stroke', '#5f5f5f')
-        .attr('stroke-width', 0.5);
+        .attr('d', path); // pointer events passed to county layer
   
   // add precip cells on top of everything else
   map.append("g").attr('id', 'precipcells')
@@ -100,7 +91,6 @@ function createMap() {
         .enter()
         .append('path')
         .attr('d', path)
-        .attr("pointer-events", "none") // pointer events passed to county layer
         .attr('fill', function(d) { 
           d.precip = precip.get(d.properties.ID); //use "get" to grab precip from the match ID
           if(d.precip > 0) { //need if statement, adding "transparent" to array did not work
@@ -108,10 +98,7 @@ function createMap() {
           } else {
             return "transparent";
           } 
-        })
-        .attr('stroke', 'none')
-        .attr("opacity", "0.7");
-
+        });
 }
 
 function mouseover(d) {
@@ -121,11 +108,8 @@ function mouseover(d) {
 	
 	d3.select(".tooltip")
 		.style("display", "block")
-		.style("position", "absolute")
 		.style("left", x_val+"px")
 		.style("top", (y_val-y_buffer)+"px")
-		.style("text-anchor", "end")
-		.style("text-transform", "capitalize")
 		.text(formatCountyName(d.properties.ID));
   
   d3.select(this).style('fill', 'orange'); 

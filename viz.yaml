@@ -177,6 +177,10 @@ publish:
     location: "js/map.js"
     mimetype: application/javascript
   -
+    id: map_css
+    location: "layout/css/map.css"
+    mimetype: text/css
+  -
     id: vizstorm_page
     name: index
     template: fullpage
@@ -185,7 +189,8 @@ publish:
       lib_d3_js: "lib-d3-js"
       lib_d3_scale_js: "lib-d3-scale-js"
       map_js: "map_js"
+      map_css: "map_css"
     context:
-      resources: ["lib_d3_js", "lib_d3_scale_js"]
+      resources: ["lib_d3_js", "lib_d3_scale_js", "map_css"]
       sections: ["map_js"]
       
