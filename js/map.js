@@ -29,7 +29,6 @@ var precip = d3.map();
 
 // precip color scale
 var color = d3.scaleThreshold()
-    .domain(d3.range(0, 10)) // need better way to get range of data, should do inside queue
     .range(d3.schemeBlues[9]);
 
 // Add map features, need to queue to load more than one json
@@ -38,6 +37,7 @@ d3.queue()
   .defer(d3.json, "../cache/county_map.geojson")
   .defer(d3.json, "../cache/precip_cells.geojson")
   .defer(d3.json, "../cache/precip_cell_data.json")
+  .defer(d3.json, "../cache/precip_data_range.json")
   .await(createMap);
 
 function createMap() {
@@ -51,6 +51,10 @@ function createMap() {
 	var county_data = arguments[2];
 	var precip_cells = arguments[3];
 	var precip_data = arguments[4];
+	var precip_range = arguments[5];
+	
+	// update color scale using data
+  color.domain(precip_range.breaks);
   
   // add states
   map.append("g").attr('id', 'statepolygons')
@@ -83,6 +87,7 @@ function createMap() {
   var all_timesteps = Object.keys(precip_data);
   var timestep = 0;
   var precip_ts = precip_data[all_timesteps[timestep]];
+  
   // add precip cells on top of everything else
   map.append("g").attr('id', 'precipcells')
         .selectAll( 'path' )

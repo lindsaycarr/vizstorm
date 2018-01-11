@@ -147,6 +147,14 @@ process:
     depends: 
       precip_data: precip_cell_data
   -
+    id: precip_data_range
+    location: cache/precip_data_range.json
+    reader: json
+    processor: calculate_precip_range
+    scripts: scripts/process/calculate_precip_range.R
+    depends: 
+      precip_data: precip_cell_data
+  -
     id: state_map_geojson
     location: cache/state_map.geojson
     reader: json
