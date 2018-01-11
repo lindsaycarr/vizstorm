@@ -100,6 +100,14 @@ function createMap() {
           return getPrecipColor(precip);
         });
   
+  map.append("text")
+        .attr("id", "timestamp")
+        .attr("x", (chart_width / 2))             
+        .attr("y", (0.1*chart_height))
+        .attr("text-anchor", "middle")  
+        .style("font-size", "16px")
+        .text(all_timesteps[timestep]);
+        
   var interval = setInterval(function() {
     timestep++;
     if (timestep >= all_timesteps.length) { 
@@ -108,6 +116,7 @@ function createMap() {
       // update precip data used
       precip_ts = precip_data[all_timesteps[timestep]];
       changeColor(precip_ts);
+      updateTitle(all_timesteps[timestep]);
     }
   }, 400);
     
@@ -157,7 +166,7 @@ function getPrecipColor(precip_val) {
 }
 
 function changeColor(precip_ts) {
-  // Update…
+  
   map.selectAll("#precipcells path")
       .transition()
       .duration(1000)
@@ -166,3 +175,12 @@ function changeColor(precip_ts) {
           return getPrecipColor(precip); 
       }); 
 }
+
+function updateTitle(new_date) {
+  
+  map.selectAll("#timestamp")
+      .transition()
+      .duration(500)
+      .text(new_date); 
+}
+
