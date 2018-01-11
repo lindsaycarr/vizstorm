@@ -101,11 +101,9 @@ function createMap() {
         });
   
   map.append("text")
-        .attr("id", "timestamp")
+        .attr("class", "timestamp")
         .attr("x", (chart_width / 2))             
-        .attr("y", (0.1*chart_height))
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px")
+        .attr("y", (0.15*chart_height))
         .text(all_timesteps[timestep]);
         
   var interval = setInterval(function() {
@@ -178,7 +176,7 @@ function changeColor(precip_ts) {
 
 function updateTitle(new_date) {
   
-  map.selectAll("#timestamp")
+  map.selectAll(".timestamp")
       .transition()
       .duration(500)
       .text(new_date); 

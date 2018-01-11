@@ -32,3 +32,9 @@
   text-anchor: end;
   text-transform: capitalize;
 }
+
+.timestamp {
+  text-anchor: middle;
+  font-size: 20px;
+  text-decoration: bold;
+}
