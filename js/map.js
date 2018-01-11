@@ -42,9 +42,7 @@ d3.queue()
   .defer(d3.json, "../cache/state_map.geojson")
   .defer(d3.json, "../cache/county_map.geojson")
   .defer(d3.json, "../cache/precip_cells.geojson")
-  .defer(d3.csv, "../cache/precip_cell_data.csv", function(d) { 
-    precip.set(d.cell, +d.precip); 
-  })
+  .defer(d3.json, "../cache/precip_cell_data.json")
   .await(createMap);
 
 function createMap() {
@@ -57,6 +55,7 @@ function createMap() {
 	var state_data = arguments[1];
 	var county_data = arguments[2];
 	var precip_cells = arguments[3];
+	var precip_data = arguments[4];
   
   // add states
   map.append("g").attr('id', 'statepolygons')
@@ -84,6 +83,11 @@ function createMap() {
         .append('path')
         .attr('d', path); // pointer events passed to county layer
   
+  // animate over time steps
+  // start by intializing the first timestep
+  var all_timesteps = Object.keys(precip_data);
+  var timestep = 0;
+  var precip_ts = precip_data[all_timesteps[timestep]];
   // add precip cells on top of everything else
   map.append("g").attr('id', 'precipcells')
         .selectAll( 'path' )
@@ -91,14 +95,22 @@ function createMap() {
         .enter()
         .append('path')
         .attr('d', path)
-        .attr('fill', function(d) { 
-          d.precip = precip.get(d.properties.ID); //use "get" to grab precip from the match ID
-          if(d.precip > 0) { //need if statement, adding "transparent" to array did not work
-            return color(d.precip); 
-          } else {
-            return "transparent";
-          } 
+        .attr('fill', function(d) {
+          var precip = extractPrecipVal(precip_ts, d.properties.ID);
+          return getPrecipColor(precip);
         });
+  
+  var interval = setInterval(function() {
+    timestep++;
+    if (timestep >= all_timesteps.length) { 
+      clearInterval(interval); 
+    } else {
+      // update precip data used
+      precip_ts = precip_data[all_timesteps[timestep]];
+      changeColor(precip_ts);
+    }
+  }, 400);
+    
 }
 
 function mouseover(d) {
@@ -126,4 +138,31 @@ function formatCountyName(nm) {
   return nm.split(",").reverse().join(", ");
 }
 
+function extractPrecipVal(precip_ts, cell_id) {
+  // there's got to be a cleaner way to do this ...
+  var precip_cell = precip_ts.filter(function(i) {
+    return i.cell == cell_id;
+  });
+  var precip_val = precip_cell[0].precip;
+  return precip_val;
+}
 
+function getPrecipColor(precip_val) {
+  //need if statement, adding "transparent" to array did not work
+  if(precip_val > 0) { 
+    return color(precip_val); 
+  } else {
+    return "transparent";
+  } 
+}
+
+function changeColor(precip_ts) {
+  // Update…
+  map.selectAll("#precipcells path")
+      .transition()
+      .duration(1000)
+      .attr('fill', function(d) { 
+          var precip = extractPrecipVal(precip_ts, d.properties.ID);
+          return getPrecipColor(precip); 
+      }); 
+}

@@ -81,8 +81,8 @@ fetch:
     depends: viewbox_limits
   -
     id: precip_cell_data
-    location: cache/precip_cell_data.csv
-    reader: csv
+    location: cache/precip_cell_data.rds
+    reader: rds
     fetcher: stageiv_precip_gdp
     scripts: scripts/fetch/precip_cell_data.R
     depends: 
@@ -137,6 +137,14 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: precip_cells
+  - 
+    id: precip_cell_data_json
+    location: cache/precip_cell_data.json
+    reader: json 
+    processor: precip_to_json
+    scripts: [scripts/process/precip_to_json.R]
+    depends: 
+      precip_data: precip_cell_data
   -
     id: state_map_geojson
     location: cache/state_map.geojson
