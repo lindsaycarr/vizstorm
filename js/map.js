@@ -116,7 +116,7 @@ function createMap() {
       changeColor(precip_ts);
       updateTitle(all_timesteps[timestep]);
     }
-  }, 400);
+  }, 0);
     
 }
 
@@ -169,7 +169,7 @@ function changeColor(precip_ts) {
   
   map.selectAll("#precipcells path")
       .transition()
-      .duration(1000)
+      .duration(500)
       .attr('fill', function(d) { 
           var precip = extractPrecipVal(precip_ts, d.properties.ID);
           return getPrecipColor(precip); 
