@@ -22,12 +22,7 @@ var map = svg.append( 'g' )
 // Define the div for the tooltip
 var div = d3.select("body")
     .append("div")
-    .attr("class", "tooltip")
-		.style("pointer-events", "none")
-		.style("background", "rgba(255,255,255,0.8)") //white, slightly transparent
-		.style("border", "3px")
-		.style("border-radius", "8px")
-		.style("font-family", "sans-serif");
+    .attr("class", "tooltip");
 		
 // setup var to map precip data to cells
 var precip = d3.map();
@@ -131,14 +126,16 @@ function mouseover(d) {
 		.style("top", (y_val-y_buffer)+"px")
 		.text(formatCountyName(d.properties.ID));
   
-  d3.select(this).style('fill', 'orange'); 
+  d3.select(this)
+    .classed('hover', true); 
 }
 
 function mouseout(d) {
   d3.selectAll(".tooltip")
 		.style("display", "none");
 		
-  d3.select(this).style('fill', "#efefef");
+  d3.select(this)
+    .classed('hover', false);
 }
 
 function formatCountyName(nm) {

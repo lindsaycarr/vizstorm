@@ -1,3 +1,7 @@
+body {
+  font-family: sans-serif;
+}
+
 #statepolygons path,
 #statepolygons line {
   fill: #9a9a9a;
@@ -7,9 +11,14 @@
 
 #countypolygons path,
 #countypolygons line {
-  fill: #efefef;
+  fill: #fafafa;
   stroke: #c6c6c6;
   stroke-width: 0.5;
+}
+
+#countypolygons path.hover,
+#countypolygons line.hover {
+  fill: #ffa700;
 }
 
 #stateoutline path,
@@ -31,6 +40,10 @@
   position: absolute;
   text-anchor: end;
   text-transform: capitalize;
+  pointer-events: none;
+	background-color: rgba(255,255,255,0.8); /*white, slightly transparent*/
+	border: 5px;
+	border-radius: 10px;
 }
 
 .timestamp {
