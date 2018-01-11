@@ -88,6 +88,7 @@ fetch:
     depends: 
       sf_stencil: precip_cells
       time_info: animate
+    cumulative: TRUE
   -
     id: county_map_data
     location: cache/county_map_data.rds

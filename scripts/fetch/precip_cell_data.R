@@ -25,6 +25,17 @@ fetch.stageiv_precip_gdp <- function(viz){
   
   data <- geoknife::result(job, with.units = TRUE)
   
+  data <- data %>% 
+    dplyr::select(-variable, -statistic, -units) %>% 
+    tidyr::gather(key = cell, value = precipVal, -DateTime) %>% 
+    dplyr::mutate(precip = precipVal/25.4) #convert mm to inches
+  
+  if(!is.null(viz[["cumulative"]]) && viz[["cumulative"]]) {
+    data <- data %>% 
+      dplyr::group_by(cell) %>% 
+      dplyr::mutate(precip = cumsum(precip)) 
+  }
+  
   saveRDS(data, file = viz[['location']])
 }
 
