@@ -49,7 +49,7 @@ parameter:
   -
     id: spatial_metadata
     crs: '+init=epsg:4326' # works with d3.geoMercator
-    bbox: [-87, 22, -70, 34]
+    bbox: [-87, 17, -70, 34]
   -
     id: plot_metadata
     height: 5
@@ -57,8 +57,8 @@ parameter:
     pointsize: 12
   -
     id: animate
-    start: "2014-01-01"
-    stop: "2014-01-04"
+    start: "2017-09-10"
+    stop: "2017-09-13"
     step: "hour"
 
 fetch:
@@ -81,13 +81,14 @@ fetch:
     depends: viewbox_limits
   -
     id: precip_cell_data
-    location: cache/precip_cell_data.csv
-    reader: csv
+    location: cache/precip_cell_data.rds
+    reader: rds
     fetcher: stageiv_precip_gdp
     scripts: scripts/fetch/precip_cell_data.R
     depends: 
       sf_stencil: precip_cells
       time_info: animate
+    cumulative: TRUE
   -
     id: county_map_data
     location: cache/county_map_data.rds
@@ -137,6 +138,22 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: precip_cells
+  - 
+    id: precip_cell_data_json
+    location: cache/precip_cell_data.json
+    reader: json 
+    processor: precip_to_json
+    scripts: [scripts/process/precip_to_json.R]
+    depends: 
+      precip_data: precip_cell_data
+  -
+    id: precip_data_range
+    location: cache/precip_data_range.json
+    reader: json
+    processor: calculate_precip_range
+    scripts: scripts/process/calculate_precip_range.R
+    depends: 
+      precip_data: precip_cell_data
   -
     id: state_map_geojson
     location: cache/state_map.geojson

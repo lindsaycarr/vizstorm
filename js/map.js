@@ -22,19 +22,13 @@ var map = svg.append( 'g' )
 // Define the div for the tooltip
 var div = d3.select("body")
     .append("div")
-    .attr("class", "tooltip")
-		.style("pointer-events", "none")
-		.style("background", "rgba(255,255,255,0.8)") //white, slightly transparent
-		.style("border", "3px")
-		.style("border-radius", "8px")
-		.style("font-family", "sans-serif");
+    .attr("class", "tooltip");
 		
 // setup var to map precip data to cells
 var precip = d3.map();
 
 // precip color scale
 var color = d3.scaleThreshold()
-    .domain(d3.range(0, 10)) // need better way to get range of data, should do inside queue
     .range(d3.schemeBlues[9]);
 
 // Add map features, need to queue to load more than one json
@@ -42,9 +36,8 @@ d3.queue()
   .defer(d3.json, "../cache/state_map.geojson")
   .defer(d3.json, "../cache/county_map.geojson")
   .defer(d3.json, "../cache/precip_cells.geojson")
-  .defer(d3.csv, "../cache/precip_cell_data.csv", function(d) { 
-    precip.set(d.cell, +d.precip); 
-  })
+  .defer(d3.json, "../cache/precip_cell_data.json")
+  .defer(d3.json, "../cache/precip_data_range.json")
   .await(createMap);
 
 function createMap() {
@@ -57,6 +50,11 @@ function createMap() {
 	var state_data = arguments[1];
 	var county_data = arguments[2];
 	var precip_cells = arguments[3];
+	var precip_data = arguments[4];
+	var precip_range = arguments[5];
+	
+	// update color scale using data
+  color.domain(precip_range.breaks);
   
   // add states
   map.append("g").attr('id', 'statepolygons')
@@ -84,6 +82,12 @@ function createMap() {
         .append('path')
         .attr('d', path); // pointer events passed to county layer
   
+  // animate over time steps
+  // start by intializing the first timestep
+  var all_timesteps = Object.keys(precip_data);
+  var timestep = 0;
+  var precip_ts = precip_data[all_timesteps[timestep]];
+  
   // add precip cells on top of everything else
   map.append("g").attr('id', 'precipcells')
         .selectAll( 'path' )
@@ -91,14 +95,29 @@ function createMap() {
         .enter()
         .append('path')
         .attr('d', path)
-        .attr('fill', function(d) { 
-          d.precip = precip.get(d.properties.ID); //use "get" to grab precip from the match ID
-          if(d.precip > 0) { //need if statement, adding "transparent" to array did not work
-            return color(d.precip); 
-          } else {
-            return "transparent";
-          } 
+        .attr('fill', function(d) {
+          var precip = extractPrecipVal(precip_ts, d.properties.ID);
+          return getPrecipColor(precip);
         });
+  
+  map.append("text")
+        .attr("class", "timestamp")
+        .attr("x", (chart_width / 2))             
+        .attr("y", (0.15*chart_height))
+        .text(all_timesteps[timestep]);
+        
+  var interval = setInterval(function() {
+    timestep++;
+    if (timestep >= all_timesteps.length) { 
+      clearInterval(interval); 
+    } else {
+      // update precip data used
+      precip_ts = precip_data[all_timesteps[timestep]];
+      changeColor(precip_ts);
+      updateTitle(all_timesteps[timestep]);
+    }
+  }, 0);
+    
 }
 
 function mouseover(d) {
@@ -112,18 +131,56 @@ function mouseover(d) {
 		.style("top", (y_val-y_buffer)+"px")
 		.text(formatCountyName(d.properties.ID));
   
-  d3.select(this).style('fill', 'orange'); 
+  d3.select(this)
+    .classed('hover', true); 
 }
 
 function mouseout(d) {
   d3.selectAll(".tooltip")
 		.style("display", "none");
 		
-  d3.select(this).style('fill', "#efefef");
+  d3.select(this)
+    .classed('hover', false);
 }
 
 function formatCountyName(nm) {
   return nm.split(",").reverse().join(", ");
 }
 
+function extractPrecipVal(precip_ts, cell_id) {
+  // there's got to be a cleaner way to do this ...
+  var precip_cell = precip_ts.filter(function(i) {
+    return i.cell == cell_id;
+  });
+  var precip_val = precip_cell[0].precip;
+  return precip_val;
+}
+
+function getPrecipColor(precip_val) {
+  //need if statement, adding "transparent" to array did not work
+  if(precip_val > 0) { 
+    return color(precip_val); 
+  } else {
+    return "transparent";
+  } 
+}
+
+function changeColor(precip_ts) {
+  
+  map.selectAll("#precipcells path")
+      .transition()
+      .duration(500)
+      .attr('fill', function(d) { 
+          var precip = extractPrecipVal(precip_ts, d.properties.ID);
+          return getPrecipColor(precip); 
+      }); 
+}
+
+function updateTitle(new_date) {
+  
+  map.selectAll(".timestamp")
+      .transition()
+      .duration(500)
+      .text(new_date); 
+}
 
