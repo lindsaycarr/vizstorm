@@ -48,7 +48,7 @@ info:
 parameter:
   -
     id: spatial_metadata
-    crs: '+init=epsg:4326' # works with d3.geoMercator
+    crs: '+init=epsg:4326' # works with d3.geoAlbers
     bbox: [-87, 17, -70, 34]
   -
     id: plot_metadata
