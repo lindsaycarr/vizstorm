@@ -23,7 +23,8 @@ process.save_map <- function(viz){
       map_data_sp@data <- data.frame(ID = row.names(map_data_sp@data), stringsAsFactors = FALSE)
     }
     rgdal::writeOGR(map_data_sp, viz[['location']], 
-                    layer="map_data_sp", driver="GeoJSON")
+                    layer="map_data_sp", driver="GeoJSON",
+                    check_exists=TRUE, overwrite_layer=TRUE)
   } else {
     write.table(data.frame(), viz[["location"]])
   }

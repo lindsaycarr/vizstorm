@@ -16,9 +16,9 @@ info:
   required-packages:
     vizlab:
       repo: github
-      version: 0.2.2.9008
+      version: 0.2.2.9009
       name: USGS-VIZLAB/vizlab
-      ref: v0.2.2.9008
+      ref: NA
     dplyr:
       repo: CRAN
       version: 0.5.0
@@ -138,6 +138,7 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: precip_cells
+    mimetype: application/geo+json
   - 
     id: precip_cell_data_json
     location: cache/precip_cell_data.json
@@ -146,6 +147,7 @@ process:
     scripts: [scripts/process/precip_to_json.R]
     depends: 
       precip_data: precip_cell_data
+    mimetype: application/geo+json
   -
     id: precip_data_range
     location: cache/precip_data_range.json
@@ -154,6 +156,7 @@ process:
     scripts: scripts/process/calculate_precip_range.R
     depends: 
       precip_data: precip_cell_data
+    mimetype: application/geo+json
   -
     id: state_map_geojson
     location: cache/state_map.geojson
@@ -162,6 +165,7 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: state_map_data
+    mimetype: application/geo+json
   -
     id: county_map_geojson
     location: cache/county_map.geojson
@@ -170,6 +174,7 @@ process:
     scripts: [scripts/process/save_map.R]
     depends: 
       map_data: county_map_data
+    mimetype: application/geo+json
   -
     id: puerto_rico_map_geojson
     location: cache/puerto_rico_map.geojson
@@ -207,6 +212,11 @@ publish:
       lib_d3_scale_js: "lib-d3-scale-js"
       map_js: "map_js"
       map_css: "map_css"
+      state_map_geojson: "state_map_geojson"
+      county_map_geojson: "county_map_geojson"
+      precip_cells_geojson: "precip_cells_geojson"
+      precip_cell_data_json: "precip_cell_data_json"
+      precip_data_range: "precip_data_range"
     context:
       resources: ["lib_d3_js", "lib_d3_scale_js", "map_css"]
       sections: ["map_js"]

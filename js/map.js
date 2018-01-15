@@ -34,11 +34,11 @@ var color = d3.scaleThreshold()
 
 // Add map features, need to queue to load more than one json
 d3.queue()
-  .defer(d3.json, "../cache/state_map.geojson")
-  .defer(d3.json, "../cache/county_map.geojson")
-  .defer(d3.json, "../cache/precip_cells.geojson")
-  .defer(d3.json, "../cache/precip_cell_data.json")
-  .defer(d3.json, "../cache/precip_data_range.json")
+  .defer(d3.json, "data/state_map.geojson")
+  .defer(d3.json, "data/county_map.geojson")
+  .defer(d3.json, "data/precip_cells.geojson")
+  .defer(d3.json, "data/precip_cell_data.json")
+  .defer(d3.json, "data/precip_data_range.json")
   .await(createMap);
 
 function createMap() {
@@ -84,7 +84,7 @@ function createMap() {
         .attr('d', path); // pointer events passed to county layer
   
   // animate over time steps
-  // start by intializing the first timestep
+  // start by initializing the first timestep
   var all_timesteps = Object.keys(precip_data);
   var timestep = 0;
   var precip_ts = precip_data[all_timesteps[timestep]];
