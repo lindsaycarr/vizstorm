@@ -3,9 +3,10 @@ var chart_width     =   1000;
 var chart_height    =   600;
 
 // Projection
-var projection = d3.geoMercator() //changing to geoAlbers makes the map disappear
-    .scale(1500)
-    .center([-91.34397, 32.25196])
+var projection = d3.geoAlbers()
+    .scale([1800])
+    // default is .rotate([96,0]) to center on US
+    .center([96-91.34397, 32.25196]) // adjust longitude relative to rotation
     .translate([chart_width / 2, chart_height / 2]);
 var path = d3.geoPath()
     .projection(projection);
